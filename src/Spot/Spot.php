@@ -37,7 +37,7 @@ class Spot {
     public function createWebApp() {
         $injector = call_user_func_array(
             [$this, "createInjector"],
-            array_merge(func_get_args(), ["Spot\App\Web\Impl\WebAppModule", "Spot\App\Web\Impl\RequestModule"])
+            array_merge(func_get_args(), ["Spot\App\Web\Impl\WebAppModule"])
         );
         
         return $injector->getInstance("Spot\App\Web\WebApp");

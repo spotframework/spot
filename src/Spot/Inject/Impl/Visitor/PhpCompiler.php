@@ -93,10 +93,20 @@ class PhpCompiler implements BindingVisitor {
             $this->writer->write(' */');
         }
         
-        $this->writer->write('\\');
-        $this->writer->write($binding->getModule());
-        $this->writer->write('::');
+        $method = $binding->getMethod();
+        
+        if($method->isStatic()) {
+            $this->writer->write('\\');
+            $this->writer->write($binding->getModule());
+            $this->writer->write('::');
+        } else {
+            $this->writer->write('$m[');
+            $this->writer->writeValue($binding->getIndex());
+            $this->writer->write(']->');
+        }
+        
         $this->writer->write($binding->getProvider());
+        
         $this->writeParameters($binding->getParameters());
     }
 

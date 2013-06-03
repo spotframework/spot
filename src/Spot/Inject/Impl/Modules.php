@@ -4,21 +4,21 @@ namespace Spot\Inject\Impl;
 use ArrayIterator;
 use IteratorAggregate;
 
-class Modules implements IteratorAggregate {
-    private $modules = [],
-            $hash;
+class Modules extends \ArrayObject {
+    private $hash;
     
-    public function __construct(array $modules) {        
-        $this->modules = array_values(array_unique($modules));
-    }
-    
-    public function hash() {        
-        return 
-            $this->hash ?: 
-            $this->hash = md5(implode($this->modules));
-    }
-    
-    public function getIterator() {
-        return new ArrayIterator($this->modules);
+    public function hash() {
+        if(empty($this->hash)) {
+            $modules = [];
+            foreach($this as $module) {
+                if(is_object($module)) {
+                    $module = get_class($module);
+                }
+            }
+            
+            $this->hash = md5(implode($modules));
+        }
+        
+        return $this->hash;
     }
 }

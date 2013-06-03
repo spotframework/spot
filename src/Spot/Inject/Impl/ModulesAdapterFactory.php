@@ -28,8 +28,6 @@ class ModulesAdapterFactory {
 
 /**
  * Configured with
- *     '.implode('
- *     ', iterator_to_array($this->builder->getModules())).'
  */
 class '.$className.' {
     const SINGLETONS_SIZE = '.$size.';

@@ -34,20 +34,22 @@ class BindingBuilder {
         if($this->builded) return;
 
         $modules = $configs = [];
-        foreach($this->modules as $module) {
-            if(strpos($module, '*') !== false) {
+        foreach($this->modules as $index => $module) {
+            if(is_object($module)) {
+                $modules[$index] = $module;
+            } else if(strpos($module, '*') !== false) {
                 $configs = array_merge($configs, glob($module));
             } else if(is_file($module)) {
                 $configs[] = $module;
             } else {
-                $modules[] = $module;
+                $modules[$index] = $module;
             }
         }
 
         $this->config->bindAll($configs);
 
-        foreach($modules as $module) {
-            $this->module->bindNamed($module);
+        foreach($modules as $index => $module) {
+            $this->module->bindNamed($module, $index);
         }
         
         foreach($this->visitors as $visitor) {

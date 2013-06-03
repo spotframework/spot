@@ -1,17 +1,15 @@
 <?php
 namespace Spot\App\Web;
 
-/**
- *
- * @package Spot\App\Web
- */
+use Spot\Http\Request;
+
 interface WebApp {
     const VIEW_RENDERERS = "webapp.view-renderers";
     
     /**
-     * Produce response from current configured request
+     * Transform request object into appropriate response object
      *
      * @return Response
      */
-    function handleRequest();
+    function handle(Request $request);
 }

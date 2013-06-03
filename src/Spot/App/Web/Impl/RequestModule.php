@@ -7,9 +7,15 @@ use Spot\Inject\Provides;
 use Spot\Inject\Singleton;
 
 class RequestModule {
+    private $request;
+    
+    public function __construct(Request $request) {
+        $this->request = $request;
+    }
+    
     /** @Provides("Spot\Http\Request") @Singleton */
-    static function provideRequest() {
-        return Request::createFromGlobal();
+    function provideRequest() {
+        return $this->request;
     }
     
     /** @Provides("Spot\Http\Response") @Singleton */

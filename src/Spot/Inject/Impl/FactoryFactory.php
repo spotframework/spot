@@ -78,16 +78,16 @@ class FactoryFactory {
             $fqcn = $this->codeStorage->store($className, 'use Spot\Inject\Key;
 use Spot\Inject\Impl\InjectorImpl;
 use Spot\Inject\Impl\SingletonPool;
+use Spot\Inject\Impl\Modules;
 
 /**
  * Provides '.$key.'
  * 
  * Configured with
- *     '.implode('
- *     ', iterator_to_array($this->modules)).'
+ *     
  */
 class '.$className.' {
-    static function get(SingletonPool $s, InjectorImpl $i) {
+    static function get(SingletonPool $s, InjectorImpl $i, Modules $m) {
         return '.$writer->getCode().';
     }
 }');

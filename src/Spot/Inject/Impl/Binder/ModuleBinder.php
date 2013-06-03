@@ -33,14 +33,14 @@ class ModuleBinder {
         $this->pointCuts = $pointCuts;
     }
     
-    public function bindNamed($moduleName) {
-        return $this->bind($this->reflection->getType($moduleName));
+    public function bindNamed($moduleName, $index) {
+        return $this->bind($this->reflection->getType($moduleName), $index);
     }
     
-    public function bind(Type $module) {
+    public function bind(Type $module, $index) {
         foreach($module->getMethods() as $method) {
             if($method->isAnnotatedWith("Spot\Inject\Provides")) {
-                $this->bindProvider($method);
+                $this->bindProvider($method, $index);
                 
                 if($method->isAnnotatedWith("Spot\Inject\Intercept")) {
                     $this->bindInterceptor($method);
@@ -49,7 +49,7 @@ class ModuleBinder {
         }
     }
     
-    public function bindProvider(Method $method) {
+    public function bindProvider(Method $method, $index) {
         $key = Key::ofProvider($method);
         
         $parameters = [];
@@ -57,7 +57,7 @@ class ModuleBinder {
             $parameters[] = $this->bindParameter($parameter);
         }
         
-        $binding = new ProviderMethodBinding($key, $method, $parameters);
+        $binding = new ProviderMethodBinding($key, $method, $parameters, $index);
         if( ($configured = $this->bindings->get($key)) 
             && 
             (

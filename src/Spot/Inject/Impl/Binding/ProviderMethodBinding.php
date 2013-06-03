@@ -7,16 +7,23 @@ use Spot\Inject\Impl\BindingVisitor;
 
 class ProviderMethodBinding extends AbstractBinding {
     private $method,
-            $parameters;
+            $parameters,
+            $index;
     
     public function __construct(
             Key $key,
             Method $method,
-            array $parameters) {
+            array $parameters,
+            $index) {
         parent::__construct($key);
 
         $this->method = $method;
         $this->parameters = $parameters;
+        $this->index = $index;
+    }
+    
+    public function getIndex() {
+        return $this->index;
     }
     
     /**
