@@ -14,6 +14,8 @@ class Modules extends \ArrayObject {
                 if(is_object($module)) {
                     $module = get_class($module);
                 }
+                
+                $modules[] = $module;
             }
             
             $this->hash = md5(implode($modules));
