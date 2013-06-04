@@ -118,7 +118,6 @@ class '.$className.' {
         $config = new ConfigBinder($configs, $resolver, $bindings);
 
         $visitors = [
-            new LinkedBindingOptimizer($bindings),
             new SingletonMarker($bindings, $singletons), 
             new BindingResolver($bindings, $reflection, $jitBinder), 
             new CircularProvider($bindings, $jitBinder),
