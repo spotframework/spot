@@ -5,13 +5,12 @@ use ArrayIterator;
 use IteratorAggregate;
 use Spot\Inject\Key;
 use Spot\Inject\Impl\Binding\InjectorBinding;
-use Spot\Inject\Impl\Binding\InstanceBinding;
 
 class Bindings implements IteratorAggregate {
     private $bindings = [];
     
     public function __construct() {
-        $this->put(Key::ofType('Spot\Inject\Injector'), new InjectorBinding());
+        $this->put(Key::ofType("Spot\Inject\Injector"), new InjectorBinding());
     }
     
     /**
@@ -25,7 +24,7 @@ class Bindings implements IteratorAggregate {
     }
     
     /**
-     * Get binding
+     * Get {@link \Spot\Inject\Impl\Binding}
      * 
      * @param \Spot\Inject\Key $key
      * @return \Spot\Inject\Impl\Binding|null null when binding not exists
@@ -34,27 +33,6 @@ class Bindings implements IteratorAggregate {
         if(isset($this->bindings[$key->hash()])) {
             return $this->bindings[$key->hash()];
         }
-    }
-    
-    public function link() {
-        $linked = new Bindings();
-        foreach($this as $hash => $binding) {
-            if($binding instanceof InstanceBinding) {
-                $linked->bindings[$hash] = $binding;
-            }
-        }
-        return $linked;
-    }
-    
-    public function getInstanceSize() {
-        $count = 0;
-        foreach($this as $hash => $binding) {
-            if($binding instanceof InstanceBinding) {
-                ++$count;
-            }
-        }
-        
-        return $count;
     }
     
     public function getIterator() {

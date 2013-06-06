@@ -7,7 +7,6 @@ use Spot\Inject\Impl\Binding\CollectionBinding;
 use Spot\Inject\Impl\Binding\ConstantBinding;
 use Spot\Inject\Impl\Binding\InjectorBinding;
 use Spot\Inject\Impl\Binding\InlineBinding;
-use Spot\Inject\Impl\Binding\InstanceBinding;
 use Spot\Inject\Impl\Binding\LazyBinding;
 use Spot\Inject\Impl\Binding\OptionalBinding;
 use Spot\Inject\Impl\Binding\ProviderMethodBinding;
@@ -41,8 +40,6 @@ abstract class AbstractVisitor implements BindingVisitor {
     public function visitInjector(InjectorBinding $binding) {}
 
     public function visitInline(InlineBinding $binding) {}
-    
-    public function visitInstance(InstanceBinding $binding) {}
 
     public function visitLazy(LazyBinding $binding) {}
 

@@ -16,8 +16,8 @@ class SingletonMarker extends AbstractVisitor {
             SingletonPool $singletons) {
         parent::__construct($bindings);
         
+        $this->count = 0;
         $this->singletons = $singletons;
-        $this->count = $bindings->getInstanceSize();
     }
     
     public function visit() {        

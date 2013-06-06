@@ -73,8 +73,8 @@ class InjectorImpl implements Injector {
             $modules
         ));
         
+        $bindings = new Bindings();
         $singletons = $this->singletons->link();
-        $bindings = $this->bindings->link();
         
         $aspect = AspectWeaver::create(
             $this->getInstance("Spot\Reflect\Reflection"),
@@ -95,17 +95,11 @@ class InjectorImpl implements Injector {
             array $constants,
             Reflection $reflection, 
             CodeStorage $codeStorage) {
-        $modules = new Modules($modules);
+        $modules = new Modules(array_merge([
+            new BuiltInModule($constants, $reflection, $codeStorage)
+        ], $modules));
         $bindings = new Bindings();
         $singletons = new SingletonPool();
-        
-        $builtIn = new BuiltInBinder($bindings, $singletons);
-        $builtIn->bind(Key::ofType("Spot\Reflect\Reflection"), $reflection);
-        $builtIn->bind(Key::ofType("Spot\Code\CodeStorage"), $codeStorage);
-        foreach($constants as $name => $value) {
-            $key = Key::ofConstant(Named::name($name));
-            $bindings->put($key, new ConstantBinding($key, $value));
-        }
         
         $aspect = AspectWeaver::create($reflection, $codeStorage);
         $factory = FactoryFactory::create($modules, $bindings, $reflection, $codeStorage, $singletons, $aspect);

@@ -3,7 +3,6 @@ namespace Spot\Inject\Impl;
 
 use Spot\Inject\Impl\Binding\InjectorBinding;
 use Spot\Inject\Impl\Binding\InlineBinding;
-use Spot\Inject\Impl\Binding\InstanceBinding;
 use Spot\Inject\Impl\Binding\LazyBinding;
 use Spot\Inject\Impl\Binding\ProviderMethodBinding;
 use Spot\Inject\Impl\Binding\SingletonBinding;
@@ -16,8 +15,6 @@ interface BindingVisitor {
     function visitInjector(InjectorBinding $binding);
     
     function visitInline(InlineBinding $binding);
-    
-    function visitInstance(InstanceBinding $binding);
     
     function visitLazy(LazyBinding $binding);
     
