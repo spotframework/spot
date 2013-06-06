@@ -5,6 +5,7 @@ use Spot\Http\Request;
 use Spot\Http\Response;
 use Spot\Inject\Named;
 use Spot\App\Web\WebApp;
+use Spot\App\Web\View;
 
 class RequestHandler {
     private $router,
@@ -37,14 +38,10 @@ class RequestHandler {
                         $renderer::rendererOf($view) &&
                             $renderer->render($view, $this->response);
                     }
-                } else {
-                    $this->response->setHttpCode(Response::INTERNAL_SERVER_ERROR);
                 }
             }
         } catch(RoutingNotFound $e) {
             $this->response->setHttpCode(Response::NOT_FOUND);
-        } catch(\Exception $e) {
-            $this->response->setHttpCode(Response::INTERNAL_SERVER_ERROR);
         }
         
         return $this->response;
