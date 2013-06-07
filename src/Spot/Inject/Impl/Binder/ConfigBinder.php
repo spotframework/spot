@@ -50,14 +50,14 @@ class ConfigBinder {
             $this->bindings->put($key, new ConstantBinding($key, $value));
         }
 
-        foreach($this->collections as $name => $value) {
+        foreach($this->collections as $name => $indexes) {
             $key = Key::ofConstant(Named::name($name));
 
             $collection = [];
-            foreach($value as $n => $v) {
-                $binding = $this->bindings->get(Key::ofConstant(Named::name($name.'.'.$v)));
+            foreach($indexes as $index) {
+                $binding = $this->bindings->get(Key::ofConstant(Named::name($name.'.'.$index)));
 
-                $collection[$name.'.'.$v] = $binding->getValue();
+                $collection[$index] = $binding->getValue();
             }
 
             $this->bindings->put($key, new ConstantBinding($key, $collection));
