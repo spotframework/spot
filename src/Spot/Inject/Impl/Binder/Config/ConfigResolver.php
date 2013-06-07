@@ -20,7 +20,7 @@ class ConfigResolver {
 
     public function resolveItem($name, ConfigItem $item) {
         $value = $item->getValue();
-        if(!preg_match_all('/\{\s*([\w|_|\d|\.]+)\s*\}/', $value, $matches)) {
+        if(!preg_match_all('/\{\s*(\w[\w|_|\d|\.]*)\s*\}/', $value, $matches)) {
             return $item;
         }
 
