@@ -33,7 +33,10 @@ class ConfigResolver {
             } else if($placeholder === "__FILE__") {
                 $resolves[$i] = $item->getSource();
             } else if(($resolved = $this->configs->get($placeholder))) {
-                $resolves[$i] = $this->resolveItem($placeholder, $resolved)->getValue();
+                $this->resolveItem($placeholder, $resolved);
+                $item = $this->configs->get($placeholder);
+                
+                $resolves[$i] = $item->getValue();
             } else {
                 throw new \LogicException(
                     "Unable to find config with key \"{$placeholder}\", ".
@@ -46,7 +49,5 @@ class ConfigResolver {
             $name,
             new ConfigItem(str_replace($literals, $resolves, $value), $item->getSource())
         );
-
-        return $item;
     }
 }
