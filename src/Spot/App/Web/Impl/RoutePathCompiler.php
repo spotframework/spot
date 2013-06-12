@@ -9,12 +9,12 @@ class RoutePathCompiler {
     public function compile($path) {
         static
             $patterns = [
-                0 => "/\*/",
-                1 => "/\{\s*\$(\w[\d|\w|_|\-]+)\s*\}/",
+                0 => '/\*/',
+                1 => '/\{\s*\$(\w[\d|\w|_|\-]*)\s*\}/',
             ],
             $replaces = [
-                0 => "([\w|\-|_|\.]+)",
-                1 => "(?P<$1>[\w|\-|_|\.]+)",
+                0 => '([\w|\-|_|\.]+)',
+                1 => '(?P<$1>[\w|\-|_|\.]+)',
             ];
 
         return preg_replace($patterns, $replaces, $path);
