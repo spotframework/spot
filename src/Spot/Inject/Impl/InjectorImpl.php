@@ -40,7 +40,7 @@ class InjectorImpl implements Injector {
     public function get(Key $key) {
         $factory = $this->factory->getFactory($key);
         
-        return $factory::get($this->singletons, $this, $this->modules);
+        return $factory::get($this, $this->modules, $this->singletons);
     }
 
     public function getInstance($typeName) {        

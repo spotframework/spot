@@ -28,6 +28,7 @@ class ModulesAdapterFactory {
 
 /**
  * Configured with
+ *     '.$modules.'
  */
 class '.$className.' {
     const SINGLETONS_SIZE = '.$size.';

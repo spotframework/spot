@@ -26,7 +26,8 @@ class FactoryFactory {
             $bindings,
             $reflection,
             $codeStorage,
-            $aspect;
+            $aspect,
+            $maps = [];
     
     public function __construct(
             Bindings $bindings,
@@ -48,9 +49,14 @@ class FactoryFactory {
         $this->builder->build();
     }
     
+    public function getName(Key $key) {
+        return isset($this->maps[$key->hash()]) 
+            ? $this->maps[$key->hash()] 
+            : "Factory__".$this->modules->hash()."__".$key->hash();
+    }
+    
     public function getFactory(Key $key) {
-        $className = 'Factory__'.$this->modules->hash().'__'.$key->hash();
-        
+        $className = $this->getName($key);        
         $fqcn = $this->codeStorage->load($className);
         if(empty($fqcn)) {
             $this->buildBindings();
@@ -64,8 +70,7 @@ class FactoryFactory {
             
             if(empty($binding)) {
                 throw new \LogicException(
-                    'Unable to resolve dependency of '.$key.
-                    ', maybe you forgot to configure it ?'
+                    "Unable to resolve dependency of {$key}, maybe you forgot to configure it ?"
                 );
             }
             
@@ -84,16 +89,24 @@ use Spot\Inject\Impl\Modules;
  * Provides '.$key.'
  * 
  * Configured with
- *     
+ *     '.$this->modules.'
  */
 class '.$className.' {
-    static function get(SingletonPool $s, InjectorImpl $i, Modules $m) {
+    static function get(InjectorImpl $i, Modules $m, SingletonPool $s) {
         return '.$writer->getCode().';
     }
 }');
         }
         
         return $fqcn;
+    }
+    
+    public function bust(Key $key) {
+        $className = $this->getName($key);
+        
+        $this->codeStorage->bust($className);
+        
+        $this->maps[$key->hash()] = $className."__tmp";
     }
     
     public function link(

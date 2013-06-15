@@ -1,6 +1,7 @@
 <?php
 namespace Spot\Inject\Impl;
 
+use Spot\Spot;
 use Spot\Inject\Named;
 use Spot\Inject\Provides;
 use Spot\Inject\Singleton;
@@ -44,5 +45,10 @@ class BuiltInModule {
     /** @Provides @Named("app.mode") */
     function provideMode() {
         return $this->constants["app.mode"];
+    }
+    
+    /** @Provides @Named("app.debug") */
+    function provideIsDebug(/** @Named("app.mode") */$mode) {
+        return $mode === Spot::DEV_MODE;
     }
 }

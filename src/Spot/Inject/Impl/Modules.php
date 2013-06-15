@@ -1,9 +1,6 @@
 <?php
 namespace Spot\Inject\Impl;
 
-use ArrayIterator;
-use IteratorAggregate;
-
 class Modules extends \ArrayObject {
     private $hash;
     
@@ -22,5 +19,15 @@ class Modules extends \ArrayObject {
         }
         
         return $this->hash;
+    }
+    
+    public function __toString() {
+        return implode("\n *     ", array_map(function ($module) {
+            if(is_object($module)) {
+                return get_class($module);
+            }
+            
+            return $module;
+        }, iterator_to_array($this)));
     }
 }
