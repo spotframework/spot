@@ -34,7 +34,7 @@ abstract class Key {
     }
     
     static public function ofParameter(Parameter $parameter) {
-        $q = $parameter->getAnnotation('Spot\Inject\Qualifier');
+        $q = $parameter->getAnnotation("Spot\Inject\Qualifier");
         if(($class = $parameter->getClass())) {
             return self::ofType($class->name, $q);
         }
@@ -56,16 +56,16 @@ abstract class Key {
     }
     
     static public function ofProvider(Method $method) {
-        $type = $method->getAnnotation('Spot\Inject\Provides')->value;
-        $q = $method->getAnnotation('Spot\Inject\Qualifier');
+        $type = $method->getAnnotation("Spot\Inject\Provides")->value;
+        $q = $method->getAnnotation("Spot\Inject\Qualifier");
         if($type !== Provides::CONSTANT && $type !== Provides::ELEMENT) {
             return self::ofType($type, $q);
         }
         
         if(empty($q)) {
             throw new \LogicException(
-                'Invalid provider method in '.$method->class.'::'.$method->name.
-                ', constant or element provider must be annotated with Qualifier annotation'
+                "Invalid provider method in {$method->class}::{$method->name}".
+                ", constant or element provider must be annotated with Qualifier annotation"
             );
         }
         
@@ -103,7 +103,7 @@ class TypeKey extends Key {
 
 class ConstantKey extends Key {
     public function __toString() {
-        return $this->getQualifier()." ".Provides::CONSTANT;
+        return $this->getQualifier();
     }
 }
 
