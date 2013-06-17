@@ -2,12 +2,9 @@
 namespace Spot\Module\Twig;
 
 use Spot\Spot;
-use Spot\Inject\Injector;
-use Spot\Inject\Key;
 use Spot\Inject\Named;
 use Spot\Inject\Provides;
 use Spot\Inject\Singleton;
-use Spot\Reflect\Reflection;
 use Spot\App\Web\WebApp;
 
 class TwigModule {
@@ -37,16 +34,25 @@ class TwigModule {
     /** @Provides @Named("twig.cache") */
     static function provideIsCache(
             /** @Named("app.mode") */$mode,
-            Injector $injector) {
-
-        return $mode === Spot::PROD_MODE
-            ? $injector->get(Key::ofConstant(Named::name("app.dump-dir")))."/twig"
-            : false;
+            /** @Named("app.dump-dir") */$dumpDir) {
+        return $mode === Spot::PROD_MODE ? "{$dumpDir}/twig" : false;
     }
 
     /** @Provides("Twig_LoaderInterface") */
     static function provideLoader(
-            /** @Named("twig.paths") */array $paths = ['/']) {
-        return new \Twig_Loader_Filesystem($paths);
+            /** @Named("twig.paths") */array $paths = ["/"],
+            /** @Named("app.module.paths") */array $modulePaths = [],
+            /** @Named("app.module.namespaces") */array $moduleNamespaces = []) {        
+        $loader = new \Twig_Loader_Filesystem($paths);
+        foreach(array_combine($moduleNamespaces, $modulePaths) as $namespace => $path) {
+            $loader->addPath($path, $namespace);
+        }
+        
+        return $loader;
+    }
+    
+    /** @Provides(Provides::ELEMENT) @Named("twig.extensions") @Singleton */
+    static function provideSpotExtension(SpotExtension $ext) {
+        return $ext;
     }
 }

@@ -16,4 +16,9 @@ interface CodeStorage {
      * @return string Fully qualified class name
      */
     function store($name, $code);
+    
+    /**
+     * @param string $name
+     */
+    function bust($name);
 }

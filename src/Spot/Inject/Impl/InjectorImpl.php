@@ -59,6 +59,7 @@ class InjectorImpl implements Injector {
         return new $proxyClass(
             $this->getInstance("Spot\Reflect\Reflection"),
             $this,
+            $this->modules,
             $delegate
         );
     }

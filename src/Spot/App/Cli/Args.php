@@ -1,34 +1,56 @@
 <?php
 namespace Spot\App\Cli;
 
-use Spot\App\Input;
 use ArrayObject;
-use ArrayIterator;
 
-class Args extends ArrayObject implements Input {
-    public function __construct(array $args) {
-        parent::__construct($args);
+class Args {
+    private $command,
+            $options;
+    
+    public function __construct($command, array $options) {
+        $this->command = $command;
+        $this->options = $options;
+    } 
+   
+    public function getCommand() {
+        return $this->command;
     }
-
+    
+    public function getOptions() {
+        return $this->options;
+    }
+    
     static function createFromGlobal() {
         $argv = $GLOBALS["argv"];
-        array_shift($argv);
-
-        $args = [];
+        array_shift($argv); //remove script name
+        
+        return self::create($argv);
+    }
+    
+    static function create(array $argv) {
+        $command = array_shift($argv);
+        $options = [];
         for($i = 0, $c = count($argv); $i < $c; ++$i) {
-            $arg = $argv[$i];
-            if(isset($arg[0]) && $arg[0] === "-") {
-                $args[$arg] = [];
+            $option = $argv[$i];
+            if(isset($option[0]) && $option[0] === "-") {
+                $options[$option] = true;
                 while(isset($argv[++$i]) && $argv[$i][0] !== "-") {
-                    $args[$arg][] =  $argv[$i++];
+                    if(count($options[$option]) === 1) {
+                        if($options[$option] === true) {
+                            $options[$option] = $argv[$i];
+                        } else {
+                            $options[$option] = [
+                                $options[$option],
+                                $argv[$i]
+                            ];
+                        }
+                    } else {
+                        $options[$option][] = $argv[$i];
+                    }
                 }
             }
         }
-
-        return self::create($args);
-    }
-
-    static function create(array $args) {
-        return new self($args);
+        
+        return new self($command, $options);
     }
 }

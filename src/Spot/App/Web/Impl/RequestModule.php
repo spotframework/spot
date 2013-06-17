@@ -18,6 +18,11 @@ class RequestModule {
         return $this->request;
     }
     
+    /** @Provides("Spot\Http\Request\Cookie") @Singleton */
+    static function provideCookie(Request $request) {
+        return $request->cookie;
+    }
+    
     /** @Provides("Spot\Http\Response") @Singleton */
     static function provideResponse(Response $response) {
         return $response;

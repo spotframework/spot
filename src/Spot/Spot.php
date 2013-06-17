@@ -46,7 +46,7 @@ class Spot {
     public function createCliApp() {
         $injector = call_user_func_array(
             [$this, "createInjector"],
-            array_merge(func_get_args(), ["Spot\App\Cli\Impl\CliAppModule"])
+            array_merge(func_get_args(), ["Spot\App\Cli\Impl\CliModule"])
         );
 
         return $injector->getInstance("Spot\App\Cli\CliApp");

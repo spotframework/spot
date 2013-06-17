@@ -13,9 +13,11 @@ class DoctrineOrmUnitOfWork implements UnitOfWork {
     
     public function commit() {
         $this->em->flush();
+        $this->em->commit();
     }
 
     public function rollback() {
         $this->em->clear();
+        $this->em->rollback();
     }    
 }

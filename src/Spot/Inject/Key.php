@@ -103,7 +103,7 @@ class TypeKey extends Key {
 
 class ConstantKey extends Key {
     public function __toString() {
-        return $this->getQualifier();
+        return (string)$this->getQualifier();
     }
 }
 

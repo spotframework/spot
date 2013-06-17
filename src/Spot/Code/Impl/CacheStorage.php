@@ -34,4 +34,8 @@ class CacheStorage implements CodeStorage {
         
         return $this->load($name);
     }
+
+    public function bust($name) {
+        $this->cache->delete($name);
+    }
 }

@@ -13,14 +13,10 @@ class TwigRenderer implements ViewRenderer {
     }
 
     public function render(View $view, Response $response) {
-        $loader = $this->env->getLoader();
-        $loader->addPath(dirname($view->getTemplate()));
-
-        $content = $this->env->render(
+        echo $this->env->render(
             $view->getTemplate(),
             $view->getModel()
         );
-        $response->setContent($content);
     }
 
     static public function rendererOf(View $view) {

@@ -14,6 +14,10 @@ class LoggerInterceptor implements MethodInterceptor {
     }
     
     public function intercept(MethodInvocation $invocation) {
+        $sTime = microtime(true);
+        $result = $invocation->proceed();
+        $eTime = microtime(true) - $sTime;
+        
         $args = $invocation->getArguments();
         $method = $invocation->getMethod();
         $context = array_combine(array_map(function (Parameter $parameter) {
@@ -24,12 +28,13 @@ class LoggerInterceptor implements MethodInterceptor {
             '__LINE__' => $method->getStartLine(),
             '__CLASS__' => $method->getType()->name,
             '__FUNCTION__' => $method->name,
+            '__INVOKE_TIME__' => $eTime
         ], $context);
                 
         foreach($method->getAnnotations("Spot\Log\Log") as $log) {
             $this->logger->log($log->level, $log->value, $context);
         }
         
-        return $invocation->proceed();
+        return $result;
     }
 }

@@ -43,4 +43,11 @@ namespace '.$this->ns.';
         
         return $this->load($name);
     }
+
+    public function bust($name) {
+        $fqcn = $this->ns.'\\'.$name;
+        $path = $this->path.'/'.str_replace('\\', '/', $fqcn).'.php';
+        
+        unlink($path);
+    }
 }

@@ -2,5 +2,5 @@
 namespace Spot\Domain\Bind;
 
 interface Formatter {
-    function f();
+    function formattedBy();
 }

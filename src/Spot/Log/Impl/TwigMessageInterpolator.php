@@ -11,20 +11,20 @@ class TwigMessageInterpolator {
     public function __construct(
             /** @Named("log.twig.cache") */$cache = false) {
         $this->twig = new \Twig_Environment(new \Twig_Loader_String(), [
-            'cache' => $cache
+            "cache" => $cache
         ]);
         
         $this->twig->setLexer(new \Twig_Lexer($this->twig, [
-            'tag_variable' => ['{', '}'],
+            "tag_variable" => ["{", "}"],
         ]));
     }
     
     public function __invoke(array $record) {
-        if (false === strpos($record['message'], '{')) {
+        if (false === strpos($record["message"], "{")) {
             return $record;
         }
 
-        $record['message'] = $this->twig->render($record['message'], $record['context']);
+        $record["message"] = $this->twig->render($record["message"], $record["context"]);
         
         return $record;
     }

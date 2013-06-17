@@ -1,13 +1,14 @@
 <?php
 namespace Spot\Module\Doctrine\MongoDB;
 
-use Doctrine\ODM\MongoDB\Configuration;
 use Spot\Inject\Named;
 use Spot\Inject\Provides;
 use Spot\Inject\Singleton;
 use Spot\Domain\Transactional;
 use Doctrine\MongoDB\Connection;
+use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
 
 class DoctrineMongoModule {
     /** @Provides("Doctrine\MongoDB\Connection") */
@@ -17,11 +18,20 @@ class DoctrineMongoModule {
         /** @Named("mongo.username") */$username = null,
         /** @Named("mongo.password") */$password = null,
         /** @Named("mongo.database") */$database = null) {
-        return new Connection("mongodb://{$username}:{$password}@{$host}:{$port}/{$database}");
+        $connString = "mongodb://";
+        if($username) {
+            $connString .= "{$username}:{$password}@";
+        }
+        
+        $connString .= "{$host}:{$port}/{$database}";
+        
+        return new Connection($connString);
     }
 
     /** @Provides("Doctrine\ODM\MongoDB\Configuration") */
     static function provideConfiguration(
+        /** @Named("app.dump-dir") */$dumpDir,
+        /** @Named("app.module.paths") */array $paths,
         /** @Named("doctrine.mongo") */$mongo = []) {
         $configuration = new Configuration();
         foreach($mongo as $key => $value) {
@@ -29,6 +39,14 @@ class DoctrineMongoModule {
                 $configuration->{"set$key"}($value);
             }
         }
+        
+        $configuration->setMetadataDriverImpl(AnnotationDriver::create($paths));
+
+        $configuration->setHydratorDir("{$dumpDir}/DoctrineGen");
+        $configuration->setHydratorNamespace("DoctrineGen");
+        
+        $configuration->setProxyDir("{$dumpDir}/DoctrineGen");
+        $configuration->setProxyNamespace("DoctrineGen");
 
         return $configuration;
     }

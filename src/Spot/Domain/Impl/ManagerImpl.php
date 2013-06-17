@@ -3,18 +3,22 @@ namespace Spot\Domain\Impl;
 
 use Spot\Domain\DomainManager;
 use Spot\Domain\Transactional;
+use Symfony\Component\Validator\ValidatorInterface;
 
 class ManagerImpl implements DomainManager {
     private $factory,
             $finder,
+            $validator,
             $works = [];
     
     public function __construct(
             BinderFactory $factory,
             RepositoryFinder $finder,
+            ValidatorInterface $validator,
             /** @Transactional */array $works = []) {
         $this->factory = $factory;
         $this->finder = $finder;
+        $this->validator = $validator;
         $this->works = $works;
     }
     
@@ -44,7 +48,16 @@ class ManagerImpl implements DomainManager {
     }
 
     public function validate($instance, $groups = null) {
-        return $this->validator->validate($instance, $groups);
+        $s = microtime(true);
+        $result = $this->validator->validate($instance, $groups);
+        var_dump(microtime(true) - $s);
+        if(!count($result)) {
+            return true;
+        }
+        
+        var_dump(iterator_to_array($result));
+        
+        throw new \RuntimeException("Validation Failed !!");
     }
 
     public function getRepository($className) {

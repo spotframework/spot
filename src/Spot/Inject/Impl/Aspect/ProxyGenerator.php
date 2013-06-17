@@ -20,6 +20,7 @@ class ProxyGenerator {
         
         $writer->writeln('use Spot\Inject\Key;');
         $writer->writeln('use Spot\Reflect\Reflection;');
+        $writer->writeln('use Spot\Inject\Impl\Modules;');
         $writer->writeln('use Spot\Inject\Impl\InjectorImpl;');
         $writer->writeln('use Spot\Inject\Impl\Aspect\DelegateInvocation;');
         $writer->writeln('use Spot\Inject\Impl\Aspect\TerminalInvocation;');
@@ -35,14 +36,15 @@ class ProxyGenerator {
         $writer->write(' {');
         $writer->indent();
         
-        $writer->writeln('public $r, $i, $d;');
+        $writer->writeln('public $r, $m, $i, $d;');
         
-        $writer->write('function __construct(Reflection $reflection, InjectorImpl $injector, \\');
+        $writer->write('function __construct(Reflection $reflection, InjectorImpl $injector, Modules $modules, \\');
         $writer->write($type->name);
         $writer->write(' $delegate');
         $writer->write(') {');
         $writer->indent();
         $writer->writeln('$this->r = $reflection;');
+        $writer->writeln('$this->m = $modules;');
         $writer->writeln('$this->i = $injector;');
         $writer->write('$this->d = $delegate;');
         $writer->outdent();
@@ -80,6 +82,7 @@ class ProxyGenerator {
         $writer->indent();
         
         $writer->writeln('$i = $this->i;');
+        $writer->writeln('$m = $this->m;');
         $writer->writeln('$s = $i->getSingletonPool();');
         
         $writer->write('return (');

@@ -15,8 +15,9 @@ class ValidationInterceptor implements MethodInterceptor {
     public function intercept(MethodInvocation $invocation) {
         $args = $invocation->getArguments();
         foreach($invocation->getMethod()->getParameters() as $i => $parameter) {
-            if($parameter->isAnnotatedWith('Spot\Domain\Validate')) {
-                $this->domain->validate($args[$i]);
+            $v = $parameter->getAnnotation("Spot\Domain\Validate");
+            if($v) {
+                $this->domain->validate($args[$i], $v->value);
             }
         }
         

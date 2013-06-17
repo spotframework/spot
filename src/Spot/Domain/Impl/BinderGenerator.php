@@ -33,7 +33,7 @@ class BinderGenerator {
             $writer->write('$this->d = $d;');
             $writer->outdent();
             $writer->writeln('}');
-        
+
             $writer->write('function newInstance(array $b) {');
             $writer->indent();
 
@@ -41,8 +41,8 @@ class BinderGenerator {
             $this->bindConstructor($type)->compile($writer);
             
             $writer->newLine();
-            $writer->writeln('$this->bind($i, $b);');
-            $writer->writeln('return $i;');
+            $writer->newLine();
+            $writer->write('return $this->bind($i, $b);');
             
             $writer->outdent();
             $writer->writeln('}');
@@ -58,6 +58,7 @@ class BinderGenerator {
                 }
             }
             
+            $writer->write('return $i;');
             $writer->outdent();
             $writer->write('}');
         

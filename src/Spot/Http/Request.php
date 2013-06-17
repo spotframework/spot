@@ -66,10 +66,11 @@ class Request implements ArrayAccess, IteratorAggregate {
     
     public function offsetGet($index) {
         return 
-            $this->files[$index] ?:
-            $this->path[$index] ?:
-            $this->post[$index] ?:
-            $this->query[$index];
+            isset($this->files[$index]) ? $this->files[$index] :
+            isset($this->path[$index])  ? $this->path[$index] :
+            isset($this->post[$index])  ? $this->post[$index] :
+            isset($this->query[$index]) ? $this->query[$index] : 
+            null;
     }
     
     public function offsetSet($index, $value) {
@@ -127,8 +128,9 @@ class Request implements ArrayAccess, IteratorAggregate {
         }
 
         return self::create(
+            //remove query string if exists
             $_GET
-                ? substr($_SERVER['REQUEST_URI'], 0, -strlen($_SERVER['QUERY_STRING']) - 1)
+                ? substr($_SERVER['REQUEST_URI'], 0, -strlen($_SERVER['QUERY_STRING']) - 1) 
                 : $_SERVER['REQUEST_URI'],
             $_GET,
             $_POST,
