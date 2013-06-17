@@ -1,0 +1,11 @@
+{
+    "name":"spotframework/spot",
+    "require":{
+        "php":">=5.4.0",
+        "doctrine/common":"dev-master"
+    },
+    "suggest":{
+        "monolog/monolog":"*",
+        "symfony/validator":"2.4"
+    }
+}
