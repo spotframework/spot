@@ -2,10 +2,15 @@
     "name":"spotframework/spot",
     "require":{
         "php":">=5.4.0",
-        "doctrine/common":"dev-master"
+        "doctrine/common":"*"
     },
     "suggest":{
         "monolog/monolog":"*",
         "symfony/validator":"2.4"
+    },
+    "autoload":{
+        "psr-0":{
+            "Spot\\":"src/"
+        }
     }
 }
