@@ -11,9 +11,16 @@ class InstanceActionGenerator extends AbstractActionGenerator {
         $this->extractor = $extractor;
     }
     
-    public function generateBody(Method $method, CodeWriter $writer) {        
-        $writer->write('return $this->i->getInstance(');
-        $writer->writeValue($method->getType()->name);
+    public function generateBody(Method $method, CodeWriter $writer) {
+        $writer->write('return ');
+        if($method->getType()->getConstructor()) {
+            $writer->write('$this->i->getInstance(');
+            $writer->writeValue($method->getType()->name);
+        } else {
+            $writer->write('(new \\');
+            $writer->write($method->getType()->name);
+        }
+        
         $writer->write(')->');
         $writer->write($method->name);
         $writer->write('(');
