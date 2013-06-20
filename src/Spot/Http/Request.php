@@ -65,12 +65,14 @@ class Request implements ArrayAccess, IteratorAggregate {
     }
     
     public function offsetGet($index) {
-        return 
-            isset($this->files[$index]) ? $this->files[$index] :
-            isset($this->path[$index])  ? $this->path[$index] :
-            isset($this->post[$index])  ? $this->post[$index] :
-            isset($this->query[$index]) ? $this->query[$index] : 
-            null;
+        static $vars = ["files", "path", "post", "query"];
+        foreach($vars as $var) {
+            if(isset($this->{$var}[$index])) {
+                return $this->{$var}[$index];
+            }
+        }
+        
+        return null;
     }
     
     public function offsetSet($index, $value) {
