@@ -10,5 +10,5 @@ final class Validate {
      * 
      * @var array<string> 
      */
-    public $value = null;
+    public $value;
 }

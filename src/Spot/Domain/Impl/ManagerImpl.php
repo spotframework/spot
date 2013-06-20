@@ -3,6 +3,7 @@ namespace Spot\Domain\Impl;
 
 use Spot\Domain\DomainManager;
 use Spot\Domain\Transactional;
+use Spot\Domain\ValidationFailed;
 use Symfony\Component\Validator\ValidatorInterface;
 
 class ManagerImpl implements DomainManager {
@@ -48,16 +49,17 @@ class ManagerImpl implements DomainManager {
     }
 
     public function validate($instance, $groups = null) {
-        $s = microtime(true);
         $result = $this->validator->validate($instance, $groups);
-        var_dump(microtime(true) - $s);
         if(!count($result)) {
             return true;
         }
+
+        $errors = [];
+        foreach($result as $violation) {
+            $errors[$violation->getPropertyPath()][] = $violation->getMessage();
+        }
         
-        var_dump(iterator_to_array($result));
-        
-        throw new \RuntimeException("Validation Failed !!");
+        throw new ValidationFailed($errors);
     }
 
     public function getRepository($className) {
