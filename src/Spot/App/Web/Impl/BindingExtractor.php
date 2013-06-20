@@ -8,6 +8,7 @@ use Spot\App\Web\Impl\Binding\RequestBinding;
 use Spot\App\Web\Impl\Binding\ResponseBinding;
 use Spot\App\Web\Impl\Binding\RequestVarBinding;
 use Spot\App\Web\Impl\Binding\RequestTypedBinding;
+use Spot\App\Web\Impl\Binding\OptionalBinding;
 
 class BindingExtractor {
     public function extract(Method $method) {
@@ -34,13 +35,17 @@ class BindingExtractor {
             $name = $bind->value;
         }
         
-        $binding = new RequestVarBinding($name);
+        $binding = $check = new RequestVarBinding($name);
         if($class) {
             if($bind && empty($bind->value)) {
                 $binding = new RequestTypedBinding($class->name);
             } else {
                 $binding = new TypedBinding($binding, $class->name);
             }
+        }
+        
+        if($parameter->isDefaultValueAvailable()) {
+            $binding = new OptionalBinding($check, $binding, $parameter->getDefaultValue());
         }
         
         return $binding;
