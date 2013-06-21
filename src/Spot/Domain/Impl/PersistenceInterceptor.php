@@ -23,5 +23,7 @@ class PersistenceInterceptor implements MethodInterceptor {
                 $this->domain->remove($args[$i]);
             }
         }
+        
+        return $invocation->proceed();
     }    
 }
