@@ -12,6 +12,7 @@ use Spot\Http\Request\Cookie;
 use Spot\Http\Request\Server;
 use Spot\Http\Request\Body;
 use Spot\Http\Request\Path;
+use Spot\Http\Request\FilesNormalizer;
 
 class Request implements ArrayAccess, IteratorAggregate {
     const GET = "GET";
@@ -128,7 +129,7 @@ class Request implements ArrayAccess, IteratorAggregate {
             $_SERVER['REQUEST_METHOD'] === self::POST) {
             parse_str($input = file_get_contents('php://input'), $body);
         }
-
+        
         return self::create(
             //remove query string if exists
             $_GET
@@ -136,7 +137,7 @@ class Request implements ArrayAccess, IteratorAggregate {
                 : $_SERVER['REQUEST_URI'],
             $_GET,
             $_POST,
-            $_FILES,
+            FilesNormalizer::normalize($_FILES),
             $_COOKIE,
             $_SERVER,
             $body
