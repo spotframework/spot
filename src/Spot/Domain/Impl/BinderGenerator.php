@@ -58,6 +58,7 @@ class BinderGenerator {
                 }
             }
             
+            $writer->newLine();
             $writer->write('return $i;');
             $writer->outdent();
             $writer->write('}');
