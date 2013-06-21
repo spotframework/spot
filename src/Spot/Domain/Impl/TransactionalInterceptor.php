@@ -14,11 +14,10 @@ class TransactionalInterceptor implements MethodInterceptor {
         $this->domain = $domain;
     }
     
-    /** @Log("{__CLASS__} intercepting method {invocation.method.type.name}::{invocation.method.name}") */
     public function intercept(MethodInvocation $invocation) {
         ++$this->level;
         
-        try {            
+        try {
             $result = $invocation->proceed();
             
             --$this->level or $this->domain->commit();
