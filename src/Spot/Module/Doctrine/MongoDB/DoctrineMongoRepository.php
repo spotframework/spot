@@ -12,7 +12,7 @@ abstract class DoctrineMongoRepository implements Repository {
     }
     
     public function all() {
-        return $this->dm->createQueryBuilder(static::repositoryOf());
+        return new DoctrineMongoQuery($this->dm, $this->dm->getConfiguration()->getMongoCmd(), static::repositoryOf());
     }
 
     public function find($id) {
