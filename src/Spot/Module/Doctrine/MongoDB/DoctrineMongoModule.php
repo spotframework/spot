@@ -16,14 +16,13 @@ class DoctrineMongoModule {
         /** @Named("mongo.host") */$host = "localhost",
         /** @Named("mongo.port") */$port = 27017,
         /** @Named("mongo.username") */$username = null,
-        /** @Named("mongo.password") */$password = null,
-        /** @Named("mongo.database") */$database = null) {
+        /** @Named("mongo.password") */$password = null) {
         $connString = "mongodb://";
         if($username) {
             $connString .= "{$username}:{$password}@";
         }
         
-        $connString .= "{$host}:{$port}/{$database}";
+        $connString .= "{$host}:{$port}";
         
         return new Connection($connString);
     }
@@ -32,7 +31,8 @@ class DoctrineMongoModule {
     static function provideConfiguration(
         /** @Named("app.dump-dir") */$dumpDir,
         /** @Named("app.module.paths") */array $paths,
-        /** @Named("doctrine.mongo") */$mongo = []) {
+        /** @Named("doctrine.mongo") */$mongo = [],
+        /** @Named("mongo.database") */$database) {
         $configuration = new Configuration();
         foreach($mongo as $key => $value) {
             if(method_exists($configuration, "set$key")) {
@@ -47,6 +47,8 @@ class DoctrineMongoModule {
         
         $configuration->setProxyDir("{$dumpDir}/DoctrineGen");
         $configuration->setProxyNamespace("DoctrineGen");
+        
+        $configuration->setDefaultDB($database);
 
         return $configuration;
     }
