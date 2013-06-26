@@ -7,7 +7,7 @@ use Doctrine\ODM\MongoDB\Query\Builder;
 
 class DoctrineMongoQuery extends Builder implements Countable, IteratorAggregate {
     public function count() {
-        return $this->getIterator()->count();
+        return $this->getQuery()->count();
     }
     
     public function getIterator() {
