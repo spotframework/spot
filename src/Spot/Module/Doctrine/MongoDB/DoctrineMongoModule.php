@@ -13,10 +13,10 @@ use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
 class DoctrineMongoModule {
     /** @Provides("Doctrine\MongoDB\Connection") */
     static function provideConnection(
-        /** @Named("mongo.host") */$host = "localhost",
-        /** @Named("mongo.port") */$port = 27017,
-        /** @Named("mongo.username") */$username = null,
-        /** @Named("mongo.password") */$password = null) {
+            /** @Named("mongo.host") */$host = "localhost",
+            /** @Named("mongo.port") */$port = 27017,
+            /** @Named("mongo.username") */$username = null,
+            /** @Named("mongo.password") */$password = null) {
         $connString = "mongodb://";
         if($username) {
             $connString .= "{$username}:{$password}@";
@@ -29,10 +29,10 @@ class DoctrineMongoModule {
 
     /** @Provides("Doctrine\ODM\MongoDB\Configuration") */
     static function provideConfiguration(
-        /** @Named("app.dump-dir") */$dumpDir,
-        /** @Named("app.module.paths") */array $paths,
-        /** @Named("doctrine.mongo") */$mongo = [],
-        /** @Named("mongo.database") */$database = null) {
+            /** @Named("app.dump-dir") */$dumpDir,
+            /** @Named("app.module.paths") */array $paths,
+            /** @Named("doctrine.mongo") */$mongo = [],
+            /** @Named("mongo.database") */$database = null) {
         $configuration = new Configuration();
         foreach($mongo as $key => $value) {
             if(method_exists($configuration, "set$key")) {
