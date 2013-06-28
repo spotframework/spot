@@ -32,7 +32,7 @@ class DoctrineMongoModule {
         /** @Named("app.dump-dir") */$dumpDir,
         /** @Named("app.module.paths") */array $paths,
         /** @Named("doctrine.mongo") */$mongo = [],
-        /** @Named("mongo.database") */$database = nulls) {
+        /** @Named("mongo.database") */$database = null) {
         $configuration = new Configuration();
         foreach($mongo as $key => $value) {
             if(method_exists($configuration, "set$key")) {
