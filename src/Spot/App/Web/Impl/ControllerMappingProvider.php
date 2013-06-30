@@ -29,6 +29,10 @@ class ControllerMappingProvider implements MappingProvider {
                 $route->ajax = $mRoute->ajax === null ? $cRoute->ajax : $mRoute->ajax;
                 $route->params = $mRoute->params ?: $cRoute->params ?: [];
 
+                if(!isset($route->value[0]) || $route->value[0] !== "/") {
+                    throw new \LogicException("Route url must be started with \"/\", in {$controller->name}::{$method->name}()");
+                }
+                
                 $mappings[] = new RouteMapping($route, $controller->name.'::'.$method->name);
             }
         }
