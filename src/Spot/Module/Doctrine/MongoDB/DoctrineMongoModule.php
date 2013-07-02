@@ -31,14 +31,9 @@ class DoctrineMongoModule {
     static function provideConfiguration(
             /** @Named("app.dump-dir") */$dumpDir,
             /** @Named("app.module.paths") */array $paths,
-            /** @Named("doctrine.mongo") */$mongo = [],
+            /** @Named("app.debug") */$debug,
             /** @Named("mongo.database") */$database = null) {
         $configuration = new Configuration();
-        foreach($mongo as $key => $value) {
-            if(method_exists($configuration, "set$key")) {
-                $configuration->{"set$key"}($value);
-            }
-        }
         
         $configuration->setMetadataDriverImpl(AnnotationDriver::create($paths));
 
@@ -47,6 +42,9 @@ class DoctrineMongoModule {
         
         $configuration->setProxyDir("{$dumpDir}/DoctrineGen");
         $configuration->setProxyNamespace("DoctrineGen");
+        
+        $configuration->setAutoGenerateHydratorClasses($debug);
+        $configuration->setAutoGenerateProxyClasses($debug);
         
         $database && $configuration->setDefaultDB($database);
 
