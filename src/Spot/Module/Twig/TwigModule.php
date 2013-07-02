@@ -33,9 +33,9 @@ class TwigModule {
 
     /** @Provides @Named("twig.cache") */
     static function provideIsCache(
-            /** @Named("app.mode") */$mode,
+            /** @Named("app.debug") */$debug,
             /** @Named("app.dump-dir") */$dumpDir) {
-        return $mode === Spot::PROD_MODE ? "{$dumpDir}/twig" : false;
+        return $debug ? false : "{$dumpDir}/twig";
     }
 
     /** @Provides("Twig_LoaderInterface") */
