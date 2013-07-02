@@ -17,25 +17,15 @@ class TwigModule {
     static function provideEnvironment(
             \Twig_LoaderInterface $loader,
             /** @Named("app.debug") */$debug = true,
-            /** @Named("twig.cache") */$cache = false,
             /** @Named("twig.extensions") */array $extensions = []) {
         $env = new \Twig_Environment($loader, [
             'debug' => $debug,
-            'cache' => $cache,
+            'cache' => $debug ? false : "{$dumpDir}/twig",
         ]);
 
-        foreach($extensions as $extension) {
-            $env->addExtension($extension);
-        }
+        $env->setExtensions($extensions);
 
         return $env;
-    }
-
-    /** @Provides @Named("twig.cache") */
-    static function provideIsCache(
-            /** @Named("app.debug") */$debug,
-            /** @Named("app.dump-dir") */$dumpDir) {
-        return $debug ? false : "{$dumpDir}/twig";
     }
 
     /** @Provides("Twig_LoaderInterface") */
