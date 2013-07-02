@@ -16,7 +16,7 @@ class TwigModule {
     /** @Provides("Twig_Environment") @Singleton */
     static function provideEnvironment(
             \Twig_LoaderInterface $loader,
-            /** @Named("twig.debug") */$debug = true,
+            /** @Named("app.debug") */$debug = true,
             /** @Named("twig.cache") */$cache = false,
             /** @Named("twig.extensions") */array $extensions = []) {
         $env = new \Twig_Environment($loader, [
