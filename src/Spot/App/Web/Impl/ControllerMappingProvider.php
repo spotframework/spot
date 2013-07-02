@@ -26,7 +26,7 @@ class ControllerMappingProvider implements MappingProvider {
                 $route = new Route();
                 $route->value = $cRoute->value.$mRoute->value;
                 $route->method = $mRoute->method ?: $cRoute->method ?: [Request::GET, Request::POST];
-                $route->ajax = $mRoute->ajax === null ? $cRoute->ajax : $mRoute->ajax;
+                $route->ajax = (bool)($mRoute->ajax === null ? $cRoute->ajax : $mRoute->ajax);
                 $route->params = $mRoute->params ?: $cRoute->params ?: [];
 
                 if(!isset($route->value[0]) || $route->value[0] !== "/") {
