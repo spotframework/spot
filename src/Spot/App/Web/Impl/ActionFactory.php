@@ -5,6 +5,7 @@ use Spot\Reflect\Method;
 use Spot\Code\CodeStorage;
 use Spot\Inject\Injector;
 use Spot\Domain\DomainManager;
+use Spot\Inject\Lazy;
 
 class ActionFactory {
     private $static,
@@ -17,7 +18,7 @@ class ActionFactory {
             StaticActionGenerator $static, 
             InstanceActionGenerator $instance,
             Injector $injector,
-            DomainManager $domain,
+            /** @Lazy */DomainManager $domain,
             CodeStorage $storage) {
         $this->static = $static;
         $this->instance = $instance;
