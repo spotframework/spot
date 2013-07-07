@@ -6,9 +6,10 @@ use Spot\Reflect\Parameter;
 use Spot\App\Web\Impl\Binding\TypedBinding;
 use Spot\App\Web\Impl\Binding\RequestBinding;
 use Spot\App\Web\Impl\Binding\ResponseBinding;
+use Spot\App\Web\Impl\Binding\OptionalBinding;
 use Spot\App\Web\Impl\Binding\RequestVarBinding;
 use Spot\App\Web\Impl\Binding\RequestTypedBinding;
-use Spot\App\Web\Impl\Binding\OptionalBinding;
+use Spot\App\Web\Impl\Binding\RequestPropertyBinding;
 
 class BindingExtractor {
     public function extract(Method $method) {
@@ -22,22 +23,33 @@ class BindingExtractor {
     
     public function extractParameter(Parameter $parameter) {
         if(($class = $parameter->getClass())) {
-            if($class->name === "Spot\Http\Request") {
-                return new RequestBinding();
-            } else if($class->name === "Spot\Http\Response") {
-                return new ResponseBinding();
+            switch($class->name) {
+                case "Spot\Http\Request":
+                    return new RequestBinding();
+                case "Spot\Http\Response":
+                    return new ResponseBinding();
+                case "Spot\Http\Request\Cookie":
+                    return new RequestPropertyBinding("cookie");
+                case "Spot\Http\Request\Server":
+                    return new RequestPropertyBinding("server");
+                case "Spot\Http\Request\Header":
+                    return new RequestPropertyBinding("header");
+                case "Spot\Http\Request\Body":
+                    return new RequestPropertyBinding("body");
+                case "Spot\Http\Request\Files":
+                    return new RequestPropertyBinding("files");
             }
         }
         
         $name = $parameter->name;        
-        $bind = $parameter->getAnnotation("Spot\Domain\Bind\Bind");
-        if($bind && $bind->value) {
-            $name = $bind->value;
+        $param = $parameter->getAnnotation("Spot\App\Web\Param");
+        if($param && $param->value) {
+            $name = $param->value;
         }
         
         $binding = $check = new RequestVarBinding($name);
         if($class) {
-            if($bind && empty($bind->value)) {
+            if($param && empty($param->value)) {
                 $binding = new RequestTypedBinding($class->name);
             } else {
                 $binding = new TypedBinding($binding, $class->name);
