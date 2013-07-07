@@ -1,7 +1,7 @@
 <?php
 namespace Spot\Reflect\Impl;
 
-use Doctrine\Common\Annotations\AnnotationReader as DoctrineReader;
+use Doctrine\Common\Annotations\Reader as DoctrineReader;
 use Doctrine\Common\Annotations\DocParser;
 use Doctrine\Common\Annotations\PhpParser;
 
