@@ -66,6 +66,12 @@ class ManagerImpl implements DomainManager {
         return $this->finder->get($className);
     }
 
+    public function begin() {
+        foreach($this->works as $work) {
+            $work->begin();
+        }
+    }
+    
     public function commit() {
         foreach($this->works as $work) {
             $work->commit();

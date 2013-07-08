@@ -49,8 +49,19 @@ interface DomainManager {
      */
     function validate($instance, $groups = null);
     
+    /**
+     * Begin transactional of all unit of works registered in this manager
+     */
+    function begin();
+    
+    /**
+     * Commit all unit of works registered in this manager
+     */
     function commit();
     
+    /**
+     * Rollback all unit of works registered in this manager
+     */
     function rollback();
     
     /**

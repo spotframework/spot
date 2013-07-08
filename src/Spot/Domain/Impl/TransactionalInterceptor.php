@@ -15,9 +15,13 @@ class TransactionalInterceptor implements MethodInterceptor {
     }
     
     public function intercept(MethodInvocation $invocation) {
-        ++$this->level;
+        
         
         try {
+            $this->level or $this->domain->begin();
+            
+            ++$this->level;
+            
             $result = $invocation->proceed();
             
             --$this->level or $this->domain->commit();
