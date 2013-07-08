@@ -93,12 +93,9 @@ class InjectorImpl implements Injector {
     
     static public function create(
             array $modules, 
-            array $constants,
             Reflection $reflection, 
             CodeStorage $codeStorage) {
-        $modules = new Modules(array_merge([
-            new BuiltInModule($constants, $reflection, $codeStorage)
-        ], $modules));
+        $modules = new Modules($modules);
         $bindings = new Bindings();
         $singletons = new SingletonPool();
         
