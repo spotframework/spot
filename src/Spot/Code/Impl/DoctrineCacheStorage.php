@@ -1,14 +1,14 @@
 <?php
 namespace Spot\Code\Impl;
 
-use Spot\Cache\CacheManager;
 use Spot\Code\CodeStorage;
+use Doctrine\Common\Cache\Cache;
 
-class CacheStorage implements CodeStorage {
+class DoctrineCacheStorage implements CodeStorage {
     private $ns,
             $cache;
     
-    public function __construct($namespace, CacheManager $cache) {
+    public function __construct($namespace, Cache $cache) {
         $this->ns = $namespace;
         $this->cache = $cache;
     }
@@ -19,7 +19,7 @@ class CacheStorage implements CodeStorage {
             return $fqcn;
         }
         
-        $code = $this->cache->get($name);
+        $code = $this->cache->fetch($name);
         if($code) {
             eval($code);
             
@@ -28,7 +28,7 @@ class CacheStorage implements CodeStorage {
     }
     
     public function store($name, $code) {
-        $this->cache->set($name, 'namespace '.$this->ns.';
+        $this->cache->save($name, 'namespace '.$this->ns.';
 
 '.$code);
         
