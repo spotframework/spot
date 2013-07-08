@@ -7,6 +7,8 @@ use Spot\Reflect\Method;
 use Spot\Reflect\Parameter;
 use Spot\Reflect\Matcher;
 use Spot\Reflect\Annotated;
+use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\AnnotationReader as DoctrineReader;
 
@@ -71,12 +73,14 @@ class ReflectionImpl implements Reflection {
         return new Type($name, $this);
     }    
     
-    static public function create() {
+    static public function create(Cache $cache) {
         foreach(spl_autoload_functions() as $callable) {
             AnnotationRegistry::registerLoader($callable);
         }
         
-        $reader = new AnnotationReader(new DoctrineReader());
+        $doctrineReader = new DoctrineReader();
+        $doctrineReader = new CachedReader($doctrineReader, $cache);
+        $reader = new AnnotationReader($doctrineReader);
         $phpLoader = new PhpLoader();
         $nsLoader = new NamespaceLoader($phpLoader);
         
