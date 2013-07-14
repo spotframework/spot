@@ -3,9 +3,7 @@ namespace Spot\App\Web;
 
 use Spot\Http\Request;
 
-interface WebApp {
-    const VIEW_RENDERERS = "webapp.view-renderers";
-    
+interface WebApp {    
     /**
      * Transform request object into appropriate response object
      *

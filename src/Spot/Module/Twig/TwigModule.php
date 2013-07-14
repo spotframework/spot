@@ -5,10 +5,9 @@ use Spot\Spot;
 use Spot\Inject\Named;
 use Spot\Inject\Provides;
 use Spot\Inject\Singleton;
-use Spot\App\Web\WebApp;
 
 class TwigModule {
-    /** @Provides(Provides::ELEMENT) @Named(WebApp::VIEW_RENDERERS) */
+    /** @Provides(Provides::ELEMENT) @Named("app.web.view-renderers") */
     static function provideTwigRenderer(TwigRenderer $renderer) {
         return $renderer;
     }
