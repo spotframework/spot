@@ -71,7 +71,7 @@ class ModuleBinder {
             }
             
             throw new \LogicException(
-                "Binding for {$key}  in ".
+                "Binding for {$key} in ".
                 $method->getFileName().":".$method->getStartLine().
                 " is already configured in ".
                 $configured->getMethod()->getFileName().":".$configured->getMethod()->getStartLine());
