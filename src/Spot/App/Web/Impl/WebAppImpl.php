@@ -45,9 +45,5 @@ class WebAppImpl implements WebApp {
         }
         
         return $response;
-        
-        return $this->injector->fork([new RequestModule($request)])
-            ->getInstance("Spot\App\Web\Impl\RequestHandler")
-            ->handleRequest();
     }
 }
