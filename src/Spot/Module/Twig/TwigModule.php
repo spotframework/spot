@@ -16,18 +16,19 @@ class TwigModule {
     /** @Provides("Twig_Environment") @Singleton */
     static function provideEnvironment(
             \Twig_LoaderInterface $loader,
-            /** @Named("app.debug") */$debug = true,
+            /** @Named("app.debug") */$debug,
+            /** @Named("app.dump-dir") */$dumpDir,
             /** @Named("twig.extensions") */array $extensions = []) {
         $env = new \Twig_Environment($loader, [
-            'debug' => $debug,
-            'cache' => $debug ? false : "{$dumpDir}/twig",
+            "debug" => $debug,
+            "cache" => $debug ? false : "{$dumpDir}/twig",
         ]);
 
         $env->setExtensions($extensions);
 
         return $env;
     }
-
+    
     /** @Provides("Twig_LoaderInterface") */
     static function provideLoader(
             /** @Named("twig.paths") */array $paths = ["/"],
