@@ -20,14 +20,14 @@ class ConfigResolver {
 
     public function resolveItem($name, ConfigItem $item) {
         $value = $item->getValue();
-        if(!preg_match_all('/\{\s*(\w[\w|_|\d|\.]*)\s*\}/', $value, $matches)) {
+        if(!preg_match_all('/\{\s*(\w[\w|_|\d|\.|::|\\\]*)\s*\}/', $value, $matches)) {
             return $item;
         }
 
         $literals = $matches[0];
         $placeholders = $matches[1];
         $resolves = [];
-        foreach($placeholders as $i => $placeholder) {
+        foreach($placeholders as $i => $placeholder) {            
             if($placeholder === "__DIR__") {
                 $resolves[$i] = dirname($item->getSource());
             } else if($placeholder === "__FILE__") {
@@ -37,6 +37,8 @@ class ConfigResolver {
                 $item = $this->configs->get($placeholder);
                 
                 $resolves[$i] = $item->getValue();
+            } else if(defined($placeholder)) {
+                $resolves[$i] = constant($placeholder);
             } else {
                 throw new \LogicException(
                     "Unable to find config with key \"{$placeholder}\", ".
