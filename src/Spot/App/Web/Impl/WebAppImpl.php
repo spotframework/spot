@@ -17,7 +17,7 @@ class WebAppImpl implements WebApp {
     
     public function __construct(
             Router $router,
-            /** @Named("app.web.view-renderers") */$renderers = []) {
+            /** @Named("app.web.view-renderers") */array $renderers = []) {
         $this->router = $router;
         $this->renderers = $renderers;
     }
