@@ -36,7 +36,7 @@ class WebAppImpl implements WebApp {
                 if($view instanceof View) {                    
                     foreach($this->renderers as $renderer) {
                         $renderer::rendererOf($view) &&
-                            $renderer->render($view, $response);
+                            $renderer->render($view, $request, $response);
                     }
                 }
             }
