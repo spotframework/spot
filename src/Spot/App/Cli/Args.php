@@ -31,10 +31,11 @@ class Args {
         $command = array_shift($argv);
         $options = [];
         for($i = 0, $c = count($argv); $i < $c; ++$i) {
-            $option = $argv[$i];
-            if(isset($option[0]) && $option[0] === "-") {
+            if(isset($argv[$i][0]) && $argv[$i][0] === "-") {
+                $option = $argv[$i];
                 $options[$option] = true;
-                while(isset($argv[++$i]) && $argv[$i][0] !== "-") {
+                while(isset($argv[$i + 1]) && $argv[$i + 1][0] !== "-") {
+                    ++$i;
                     if(count($options[$option]) === 1) {
                         if($options[$option] === true) {
                             $options[$option] = $argv[$i];
