@@ -65,7 +65,7 @@ class Request implements ArrayAccess, IteratorAggregate {
             isset($this->query[$index]);
     }
     
-    public function offsetGet($index) {
+    public function offsetGet($index) {        
         static $vars = ["files", "path", "post", "query"];
         foreach($vars as $var) {
             if(isset($this->{$var}[$index])) {
@@ -137,7 +137,7 @@ class Request implements ArrayAccess, IteratorAggregate {
                 : $_SERVER['REQUEST_URI'],
             $_GET,
             $_POST,
-            FilesNormalizer::normalize($_FILES),
+            Files::normalize($_FILES),
             $_COOKIE,
             $_SERVER,
             $body
