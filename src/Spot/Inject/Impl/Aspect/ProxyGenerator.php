@@ -59,27 +59,10 @@ class ProxyGenerator {
                 
                 $parameters = $method->getParameters();
                 if($parameters) {
-                    $parameter = array_shift($parameters);
-                    if($parameter->isArray()) {
-                        $writer->write('array');
-                    } else if(($class = $parameter->getClass())) {
-                        $writer->write('\\');
-                        $writer->write($class->name);
-                        $writer->write(' ');
-                    }
-                    
-                    $writer->write('$');
-                    $writer->write($parameter->name);
+                    $this->generateParameter(array_shift($parameters), $writer);
                     foreach($parameters as $parameter) {
                         $writer->write(', ');
-                        if($parameter->isArray()) {
-                            $writer->write('array');
-                        } else if(($class = $parameter->getClass())) {
-                            $writer->write($class->name);
-                            $writer->write(' ');
-                        }
-                        $writer->write('$');
-                        $writer->write($parameter->name);
+                        $this->generateParameter($parameter, $writer);
                     }
                 }
                 
