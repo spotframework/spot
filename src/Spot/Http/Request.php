@@ -19,6 +19,7 @@ class Request implements ArrayAccess, IteratorAggregate {
     const PUT = "PUT";
     const POST = "POST";
     const HEAD = "HEAD";
+    const PATH = "PATCH";
     const PURGE = "PURGE";
     const TRACE = "TRACE";
     const DELETE = "DELETE";
