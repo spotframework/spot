@@ -54,6 +54,56 @@ class ProxyGenerator {
         foreach($type->getMethods(Method::IS_PUBLIC) as $method) {
             if(isset($advices[$method->name])) {
                 $this->generateMethod($method, $advices[$method->name], $writer);
+            } else if(!$method->isConstructor()) {
+                $writer->write("function {$method->name} (");
+                
+                $parameters = $method->getParameters();
+                if($parameters) {
+                    $parameter = array_shift($parameters);
+                    if($parameter->isArray()) {
+                        $writer->write('array');
+                    } else if(($class = $parameter->getClass())) {
+                        $writer->write('\\');
+                        $writer->write($class->name);
+                        $writer->write(' ');
+                    }
+                    
+                    $writer->write('$');
+                    $writer->write($parameter->name);
+                    foreach($parameters as $parameter) {
+                        $writer->write(', ');
+                        if($parameter->isArray()) {
+                            $writer->write('array');
+                        } else if(($class = $parameter->getClass())) {
+                            $writer->write($class->name);
+                            $writer->write(' ');
+                        }
+                        $writer->write('$');
+                        $writer->write($parameter->name);
+                    }
+                }
+                
+                $writer->write(') {');
+                $writer->indent();
+                $writer->write('return $this->d->');
+                $writer->write($method->name);
+                $writer->write('(');
+                
+                $parameters = $method->getParameters();
+                if($parameters) {
+                    $writer->write('$');
+                    $writer->write(array_shift($parameters)->name);
+                    foreach($parameters as $parameter) {
+                        $writer->write(', $');
+                        $writer->write($parameter->name);
+                    }
+                }
+                
+                $writer->write(');');
+                $writer->outdent();
+                $writer->write("}");
+                $writer->newLine();
+                $writer->newLine();
             }
         }
         
