@@ -3,6 +3,7 @@ namespace Spot\Module\Assetic;
 
 use Spot\App\Web\View;
 use Spot\Inject\Named;
+use Spot\Http\Request;
 use Spot\Http\Response;
 use Spot\App\Web\ViewRenderer;
 use Spot\Module\Twig\TwigView;
@@ -23,13 +24,13 @@ class TwigAssetWriterRenderer implements ViewRenderer {
             AssetFactory $factory,
             \Twig_Environment $twig,
             \Twig_LoaderInterface $twigLoader) {
-        $this->path = $path;
+        $this->path = realpath($path);
         $this->am = new LazyAssetManager($factory);
         $this->am->setLoader("twig", new TwigFormulaLoader($twig));
         $this->twigLoader = $twigLoader;
     }
     
-    public function render(View $view, Response $response) {
+    public function render(View $view, Request $request, Response $response) {
         $resource = new TwigResource($this->twigLoader, $view->getTemplate());
         $this->am->addResource($resource, "twig");
 
