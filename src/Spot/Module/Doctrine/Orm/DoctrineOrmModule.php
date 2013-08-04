@@ -11,22 +11,32 @@ use Spot\Domain\Transactional;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Configuration;
+use Doctrine\Common\Cache\Cache;
 
 
 class DoctrineOrmModule {
     /** @Provides("Doctrine\ORM\Configuration") */
     static function provideConfiguration(
-            /** @Named("app.mode") */$mode) {
-        return Setup::createAnnotationMetadataConfiguration(["/"], $mode === Spot::DEV_MODE);
+            Cache $cache,
+            /** @Named("app.debug") */$debug,
+            /** @Named("app.dump-dir") */$dumpDir,
+            /** @Named("app.module.paths") */array $paths = []) {
+        return Setup::createAnnotationMetadataConfiguration(
+            $paths, 
+            $debug, 
+            "{$dumpDir}/doctrine/orm", 
+            $cache
+        );
     }
     
     /** @Provides("Doctrine\ORM\EntityManager") @Singleton */
     static function provideEntityManager(
             Configuration $config,
-            /** @Named("doctrine.orm") */$conn = []) {
+            /** @Named("app.dump-dir") */$dumpDir, 
+            /** @Named("doctrine.orm") */$conn = null) {
         $conn = $conn ?: [
             "driver" => "pdo_sqlite",
-            "path" => realpath(sys_get_temp_dir())."/doctrine.sqlite",
+            "path" => "{$dumpDir}/doctrine/orm/db.sqlite",
         ];
         
         return EntityManager::create($conn, $config);
