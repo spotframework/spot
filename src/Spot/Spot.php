@@ -3,20 +3,25 @@ namespace Spot;
 
 use Spot\Reflect\Reflection;
 use Spot\Code\CodeStorage;
+use Doctrine\Common\Cache\Cache;
 use Spot\Inject\Impl\InjectorImpl;
+use Spot\Inject\Impl\BuiltInModule;
 
 class Spot {
     const DEV_MODE = 'dev';
     const PROD_MODE = 'prod';
     
-    private $constants,
+    private $cache,
+            $constants,
             $reflection,
             $codeStorage;
     
     public function __construct(
+            Cache $cache,
             array $constants,
             Reflection $reflection, 
             CodeStorage $codeStorage) {
+        $this->cache = $cache;
         $this->constants = $constants;
         $this->reflection = $reflection;
         $this->codeStorage = $codeStorage;
@@ -26,9 +31,12 @@ class Spot {
      * @return \Spot\Inject\Injector
      */
     public function createInjector() {        
+        $modules = array_merge(
+            [new BuiltInModule($this->constants, $this->cache, $this->reflection, $this->codeStorage), ],
+            func_get_args()
+        );
         return InjectorImpl::create(
-            func_get_args(),
-            $this->constants,
+            $modules,
             $this->reflection,
             $this->codeStorage
         );
@@ -37,7 +45,11 @@ class Spot {
     public function createWebApp() {
         $injector = call_user_func_array(
             [$this, "createInjector"],
-            array_merge(func_get_args(), ["Spot\App\Web\Impl\WebAppModule"])
+            array_merge(func_get_args(), [
+                "Spot\Module\Spot\DomainModule",
+                "Spot\Module\Symfony\ValidatorModule",
+                "Spot\App\Web\Impl\WebAppModule",
+            ])
         );
         
         return $injector->getInstance("Spot\App\Web\WebApp");

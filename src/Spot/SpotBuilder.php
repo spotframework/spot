@@ -65,8 +65,8 @@ class SpotBuilder {
     
     public function get() {
         return new Spot(
-            $this->constants, 
             $this->cache,
+            $this->constants, 
             ReflectionImpl::create($this->cache), 
             $this->codeStorage
         );
