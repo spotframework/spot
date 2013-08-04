@@ -31,9 +31,9 @@ class DoctrineMongoModule {
     /** @Provides("Doctrine\ODM\MongoDB\Configuration") */
     static function provideConfiguration(
             Cache $cache,
+            /** @Named("app.debug") */$debug,
             /** @Named("app.dump-dir") */$dumpDir,
             /** @Named("app.module.paths") */array $paths,
-            /** @Named("app.debug") */$debug,
             /** @Named("mongo.database") */$database = null) {
         $configuration = new Configuration();
 
