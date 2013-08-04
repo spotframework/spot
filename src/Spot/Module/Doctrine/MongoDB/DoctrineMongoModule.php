@@ -9,6 +9,7 @@ use Doctrine\MongoDB\Connection;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
+use Doctrine\Common\Cache\Cache;
 
 class DoctrineMongoModule {
     /** @Provides("Doctrine\MongoDB\Connection") */
@@ -34,13 +35,13 @@ class DoctrineMongoModule {
             /** @Named("app.debug") */$debug,
             /** @Named("mongo.database") */$database = null) {
         $configuration = new Configuration();
-        
-        $configuration->setMetadataDriverImpl(AnnotationDriver::create($paths));
 
-        $configuration->setHydratorDir("{$dumpDir}/DoctrineGen");
+        $configuration->setMetadataDriverImpl(AnnotationDriver::create($paths));
+        
+        $configuration->setHydratorDir("{$dumpDir}/doctrine/odm");
         $configuration->setHydratorNamespace("DoctrineGen");
         
-        $configuration->setProxyDir("{$dumpDir}/DoctrineGen");
+        $configuration->setProxyDir("{$dumpDir}/doctrine/odm");
         $configuration->setProxyNamespace("DoctrineGen");
         
         $configuration->setAutoGenerateHydratorClasses($debug);
