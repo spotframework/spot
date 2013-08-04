@@ -30,6 +30,7 @@ class DoctrineMongoModule {
 
     /** @Provides("Doctrine\ODM\MongoDB\Configuration") */
     static function provideConfiguration(
+            Cache $cache,
             /** @Named("app.dump-dir") */$dumpDir,
             /** @Named("app.module.paths") */array $paths,
             /** @Named("app.debug") */$debug,
@@ -37,6 +38,7 @@ class DoctrineMongoModule {
         $configuration = new Configuration();
 
         $configuration->setMetadataDriverImpl(AnnotationDriver::create($paths));
+        $configuration->setMetadataCacheImpl($cache);
         
         $configuration->setHydratorDir("{$dumpDir}/doctrine/odm");
         $configuration->setHydratorNamespace("DoctrineGen");
