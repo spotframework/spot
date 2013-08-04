@@ -11,6 +11,8 @@ class DoctrineMongoUnitOfWork implements UnitOfWork {
         $this->dm = $dm;
     }
     
+    public function begin() {}
+    
     public function commit() {
         $this->dm->flush();
     }
