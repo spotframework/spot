@@ -25,7 +25,7 @@ class TransactionalInterceptor implements MethodInterceptor {
             --$this->lock or $this->domain->commit();
             
             return $result;
-        } catch(\RuntimeException $e) {
+        } catch(\Exception $e) {
             --$this->lock or $this->domain->rollback();
             
             throw $e;
