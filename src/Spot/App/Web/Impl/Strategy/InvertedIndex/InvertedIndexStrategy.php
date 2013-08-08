@@ -10,22 +10,19 @@ abstract class InvertedIndexStrategy implements RoutingStrategy {
             $ajax,
             $staticUri,
             $regexPrefixUri,
-            $regexUri,
-            $params;
+            $regexUri;
 
     public function __construct(
             RequestMethodIndex $method,
             AjaxRequestIndex $ajax,
             StaticUriIndex $staticUri,
             RegexPrefixUriIndex $regexPrefixUri,
-            RegexUriIndex $regexUri,
-            ParamsIndex $params) {
+            RegexUriIndex $regexUri) {
         $this->method = $method;
         $this->ajax = $ajax;
         $this->staticUri = $staticUri;
         $this->regexPrefixUri = $regexPrefixUri;
         $this->regexUri = $regexUri;
-        $this->params = $params;
     }
 
     public function resolve(Request $request) {

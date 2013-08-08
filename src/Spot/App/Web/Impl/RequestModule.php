@@ -7,10 +7,12 @@ use Spot\Inject\Provides;
 use Spot\Inject\Singleton;
 
 class RequestModule {
-    private $request;
+    private $request,
+            $response;
     
-    public function __construct(Request $request) {
+    public function __construct(Request $request, Response $response) {
         $this->request = $request;
+        $this->response = $response;
     }
     
     /** @Provides("Spot\Http\Request") @Singleton */
@@ -24,7 +26,7 @@ class RequestModule {
     }
     
     /** @Provides("Spot\Http\Response") @Singleton */
-    static function provideResponse(Response $response) {
-        return $response;
+    function provideResponse() {
+        return $this->response;
     }
 }

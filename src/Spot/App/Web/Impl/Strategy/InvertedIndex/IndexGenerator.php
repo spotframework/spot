@@ -46,10 +46,6 @@ class IndexGenerator {
                 $ajax[$route->ajax][$i] = 1;
             }
 
-            foreach($route->params as $key => $value) {
-                $params[$i][$key] = $value;
-            }
-
             $actions[$i] = $mapping->getMethod();
         }
 
@@ -74,8 +70,7 @@ class '.$className.' extends InvertedIndexStrategy {
             new AjaxRequestIndex__'.$this->hash.',
             new StaticUriIndex__'.$this->hash.',
             new RegexPrefixUriIndex__'.$this->hash.',
-            new RegexUriIndex__'.$this->hash.',
-            new ParamsIndex__'.$this->hash.'
+            new RegexUriIndex__'.$this->hash.'
         );
     }
 }
@@ -98,10 +93,6 @@ class RegexPrefixUriIndex__'.$this->hash.' extends RegexPrefixUriIndex {
 
 class RegexUriIndex__'.$this->hash.' extends RegexUriIndex {
     static $index = '.var_export($regexUris, true).';
-}
-
-class ParamsIndex__'.$this->hash.' extends ParamsIndex {
-    static $index = '.var_export($params, true).';
 }';
     }
 }

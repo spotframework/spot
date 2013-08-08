@@ -15,11 +15,6 @@ class WebAppModule {
         return $provider;
     }
 
-    /** @Provides("Spot\App\Web\WebApp") */
-    static function provideWebApp(WebAppImpl $app) {
-        return $app;
-    }
-
     /** @Provides @Named("app.hash") */
     static function provideHash(
             /** @Named("app.module.namespaces") */array $namespaces) {

@@ -5,6 +5,11 @@ namespace Spot\App\Web;
 class Route {
     public $value;
     
+    /**
+     * Request method(s)
+     * 
+     * @var mixed
+     */
     public $method;
 
     /** @var boolean */

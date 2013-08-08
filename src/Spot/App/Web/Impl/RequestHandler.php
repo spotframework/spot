@@ -17,7 +17,7 @@ class RequestHandler {
             Router $router,
             Request $request, 
             Response $response,
-            /** @Named(WebApp::VIEW_RENDERERS) */array $renderers = []) {
+            /** @Named("app.web.view-renderers") */array $renderers = []) {
         $this->router = $router;
         $this->request = $request;
         $this->response = $response;
@@ -36,7 +36,7 @@ class RequestHandler {
                 if($view instanceof View) {
                     foreach($this->renderers as $renderer) {
                         $renderer::rendererOf($view) &&
-                            $renderer->render($view, $this->response);
+                            $renderer->render($view, $this->request, $this->response);
                     }
                 }
             }
