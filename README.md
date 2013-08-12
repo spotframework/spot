@@ -18,3 +18,14 @@ Features
 - MVC and Routing
 - Declarative Transaction Management
 - Doctrine, Twig, Monolog, and Symfony Component integration.
+
+Installation
+============
+Using composer
+
+```
+{
+  "require":{
+    "spotframework/spot":"*"
+  }
+}
