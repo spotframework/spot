@@ -3,7 +3,7 @@ namespace Spot\App\Cli;
 
 /** 
  * @Annotation 
- * @Target("CLASS")
+ * @Target("METHOD")
  */
 class Command {
     /**

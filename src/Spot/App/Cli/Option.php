@@ -11,4 +11,18 @@ class Option {
      * @var string
      */
     public $value;
+    
+    /**
+     * Option alias
+     * 
+     * @var string
+     */
+    public $alias;
+    
+    /**
+     * Option help usages
+     * 
+     * @var string
+     */
+    public $help;
 }

@@ -1,8 +1,6 @@
 <?php
 namespace Spot\App\Cli;
 
-use Spot\App\Application;
-
-interface CliApp extends Application {
-
+interface CliApp {
+    function handle(Argv $args);
 }

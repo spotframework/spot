@@ -3,7 +3,7 @@ namespace Spot\App\Cli;
 
 use ArrayObject;
 
-class Args {
+class Argv {
     private $command,
             $options;
     
@@ -23,9 +23,9 @@ class Args {
     static function createFromGlobal() {
         $argv = $GLOBALS["argv"];
         array_shift($argv); //remove script name
-        
+
         return self::create($argv);
-    }
+   }
     
     static function create(array $argv) {
         $command = array_shift($argv);
@@ -48,6 +48,13 @@ class Args {
                     } else {
                         $options[$option][] = $argv[$i];
                     }
+                }
+            } else {var_dump($i);
+                if(empty($options[""])) {
+                    $options[""] = $argv[$i];
+                } else {
+                    $options[""] = (array)$options[""];
+                    $options[""][] = $argv[$i];
                 }
             }
         }
