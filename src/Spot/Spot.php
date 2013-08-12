@@ -6,6 +6,7 @@ use Spot\Code\CodeStorage;
 use Doctrine\Common\Cache\Cache;
 use Spot\Inject\Impl\InjectorImpl;
 use Spot\Inject\Impl\BuiltInModule;
+use Spot\App\Web\Impl\WebAppImpl;
 
 class Spot {
     const DEV_MODE = 'dev';
@@ -43,16 +44,14 @@ class Spot {
     }
     
     public function createWebApp() {
-        $injector = call_user_func_array(
-            [$this, "createInjector"],
-            array_merge(func_get_args(), [
+        return new WebAppImpl([$this, "createInjector"], array_merge(
+            func_get_args(), 
+            [
                 "Spot\Module\Spot\DomainModule",
                 "Spot\Module\Symfony\ValidatorModule",
                 "Spot\App\Web\Impl\WebAppModule",
-            ])
-        );
-        
-        return $injector->getInstance("Spot\App\Web\WebApp");
+            ]
+        ));
     }
     
     public function createCliApp() {
