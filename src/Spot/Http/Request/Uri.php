@@ -5,7 +5,7 @@ class Uri {
     private $uri;
     
     public function __construct($uri) {
-        $this->uri = '/'.ltrim(urldecode($uri), '/');
+        $this->uri = '/'.trim(urldecode($uri), '/');
     }
     
     public function __toString() {

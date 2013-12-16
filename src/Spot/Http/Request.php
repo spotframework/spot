@@ -98,7 +98,21 @@ class Request implements ArrayAccess, IteratorAggregate {
     }
     
     public function getHost() {
-        return $this->server["HTTP_HOST"];
+        return $this->header["HOST"];
+    }
+
+    public function getClientIp() {
+        if(isset($this->header["CLIENT_IP"])) {
+            return $this->header["CLIENT_IP"];
+        }
+
+        if(isset($this->header["X_FORWARDED_FOR"])) {
+            $clientIp = explode(",", $this->header["X_FORWARDED_FOR"], 2);
+
+            return isset($clientIp[0]) ? trim($clientIp[0]) : '';
+        }
+
+        return $this->server["REMOTE_ADDR"];
     }
     
     public function isAjax() {
@@ -134,7 +148,7 @@ class Request implements ArrayAccess, IteratorAggregate {
         return self::create(
             //remove query string if exists
             $_GET
-                ? substr($_SERVER['REQUEST_URI'], 0, -strlen($_SERVER['QUERY_STRING']) - 1) 
+                ? substr($_SERVER['REQUEST_URI'], 0, -strlen($_SERVER['QUERY_STRING']) - 1)
                 : $_SERVER['REQUEST_URI'],
             $_GET,
             $_POST,
