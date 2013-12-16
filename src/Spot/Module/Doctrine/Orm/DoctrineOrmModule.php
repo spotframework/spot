@@ -46,7 +46,15 @@ class DoctrineORMModule {
             "path" => sys_get_temp_dir(). "/db.sqlite",
         ];
 
-        return DriverManager::getConnection($params);
+        $conn = DriverManager::getConnection($params);
+        $platform = $conn->getDatabasePlatform();
+        if(isset($params["mapping-types"])) {
+            foreach($params["mapping-types"] as $dbType => $doctrineType) {
+                $platform->registerDoctrineTypeMapping($dbType, $doctrineType);
+            }
+        }
+
+        return $conn;
     }
 
     /** @Provides(Provides::ELEMENT) @Transactional */
