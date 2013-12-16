@@ -1,117 +1,84 @@
 <?php
 namespace Spot\Inject\Impl;
 
-use Spot\Inject\Key;
-use Spot\Inject\Named;
-use Spot\Inject\TypeKey;
-use Spot\Inject\Injector;
-use Spot\Reflect\Reflection;
-use Spot\Code\CodeStorage;
+use Spot\Gen\CodeStorage;
 use Spot\Inject\Impl\Aspect\AspectWeaver;
-use Spot\Inject\Impl\Binder\BuiltInBinder;
-use Spot\Inject\Impl\Lazy\LazyFactory;
-use Spot\Inject\Impl\Lazy\LazyProxyGenerator;
-use Spot\Inject\Impl\Visitor\GraphVizVisitor;
-use Spot\Inject\Impl\Binding\ConstantBinding;
+use Spot\Inject\Impl\Binders\ConfigBinder;
+use Spot\Inject\Impl\Binders\JustInTimeBinder;
+use Spot\Inject\Impl\Binders\ModuleBinder;
+use Spot\Inject\Impl\Visitors\CircularProviderVisitor;
+use Spot\Inject\Impl\Visitors\LateBindingVisitor;
+use Spot\Inject\Impl\Visitors\ConstantFoldingVisitor;
+use Spot\Inject\Impl\Visitors\SingletonMarkerVisitor;
+use Spot\Inject\Injector;
+use Spot\Inject\Key;
+use Spot\Reflect\Reflection;
+use Psr\Log\LoggerInterface;
 
-class InjectorImpl implements Injector {    
+class InjectorImpl implements Injector {
     private $modules,
-            $bindings,
             $singletons,
-            $factory,
-            $lazy,
-            $aspect;
-    
-    public function __construct(
+            $factory;
+
+    protected function __construct(
             Modules $modules,
-            Bindings $bindings,
-            SingletonPool $singletons,
-            FactoryFactory $factory,
-            LazyFactory $lazy,
-            AspectWeaver $aspect) {
+            Singletons $singletons,
+            FactoryFactory $factory) {
         $this->modules = $modules;
-        $this->bindings = $bindings;
         $this->singletons = $singletons;
         $this->factory = $factory;
-        $this->lazy = $lazy;
-        $this->aspect = $aspect;
     }
-    
-    public function get(Key $key) {
+
+    function get(Key $key) {
         $factory = $this->factory->getFactory($key);
-        
-        return $factory::get($this, $this->modules, $this->singletons);
+
+        return $factory::get($this->singletons, $this->modules, $this, $this->factory->getAspect());
     }
 
-    public function getInstance($typeName) {        
-        return $this->get(Key::ofType($typeName));
+    function getInstance($type) {
+        return $this->get(Key::ofType($type));
     }
 
-    public function getLazy(TypeKey $key) {
-        $fqcn = $this->lazy->get($key);
-                
-        return new $fqcn($this, $key);
-    }
-    
-    public function getWovenProxy(TypeKey $key, $delegate) {
-        $proxyClass = $this->aspect->getProxyNamed($key->getTypeName());
-        
-        return new $proxyClass(
-            $this->getInstance("Spot\Reflect\Reflection"),
-            $this,
-            $this->modules,
-            $delegate
-        );
-    }
+    function fork(array $modules) {
+        if(empty($modules)) {
+            return $this;
+        }
 
-    public function getSingletonPool() {
-        return $this->singletons;
-    }
-    
-    public function fork(array $modules) {
         $modules = new Modules(array_merge(
-            $this->getModules(),
+            iterator_to_array($this->modules),
             $modules
         ));
-        
         $bindings = new Bindings();
-        $singletons = $this->singletons->link();
-        
-        $aspect = AspectWeaver::create(
-            $this->getInstance("Spot\Reflect\Reflection"),
-            $this->getInstance("Spot\Code\CodeStorage")
-        );
-        
-        $factory = $this->factory->link($modules, $bindings, $singletons, $aspect);
-        
-        return new self($modules, $bindings, $singletons, $factory, $this->lazy, $aspect);
+        $singletons = new LinkedSingletons($this->singletons);
+        $factory = $this->factory->fork($modules, $bindings, $singletons);
+
+        return new InjectorImpl($modules, $singletons, $factory);
     }
-    
-    public function getModules() {
-        return iterator_to_array($this->modules);
-    }
-    
+
+    /**
+     * @param array $modules
+     * @param Reflection $reflection
+     * @param CodeStorage $storage
+     * @param LoggerInterface $logger
+     * @return Injector
+     */
     static public function create(
-            array $modules, 
-            Reflection $reflection, 
-            CodeStorage $codeStorage) {
+            array $modules,
+            Reflection $reflection,
+            CodeStorage $storage,
+            LoggerInterface $logger) {
         $modules = new Modules($modules);
         $bindings = new Bindings();
-        $singletons = new SingletonPool();
-        
-        $aspect = AspectWeaver::create($reflection, $codeStorage);
-        $factory = FactoryFactory::create($modules, $bindings, $reflection, $codeStorage, $singletons, $aspect);
-        
-        $lazyGen = new LazyProxyGenerator();
-        $lazy = new LazyFactory($codeStorage, $reflection, $lazyGen);
-        
-        return new self(
+        $singletons = new Singletons();
+
+        $factory = FactoryFactory::create(
             $modules,
             $bindings,
             $singletons,
-            $factory,
-            $lazy,
-            $aspect
+            $storage,
+            $reflection
         );
+
+        return new InjectorImpl($modules, $singletons, $factory);
     }
 }

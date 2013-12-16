@@ -1,5 +1,10 @@
 <?php
 namespace Spot\Inject;
 
-/** @Annotation */
-final class Singleton {}
+/**
+ * @Annotation
+ * @Target("METHOD")
+ */
+class Singleton {
+
+}

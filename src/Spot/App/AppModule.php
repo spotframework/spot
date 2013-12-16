@@ -4,24 +4,26 @@ namespace Spot\App;
 use Spot\Inject\Named;
 use Spot\Inject\Provides;
 
-class AppModule {    
-    static function getReflection() {
-        static $reflections = [];
-        $class = get_called_class();
-        if(!isset($reflections[$class])) {
-            $reflections[$class] = new \ReflectionClass(get_called_class());
+class AppModule {
+    static public function getReflection() {
+        static $r = [];
+
+        $n = get_called_class();
+        if(!isset($r[$n])) {
+            $r[$n] = new \ReflectionClass($n);
+
         }
-        
-        return $reflections[$class];
+
+        return $r[$n];
     }
-    
+
+    /** @Provides(Provides::ELEMENT) @Named("app.module.paths") */
+    static public function providePath() {
+        return dirname(static::getReflection()->getFilename());
+    }
+
     /** @Provides(Provides::ELEMENT) @Named("app.module.namespaces") */
-    static function provideNamespace() {
-        return self::getReflection()->getNamespaceName();
-    }
-    
-    /** @Provides(Provides::ELEMENT) @Named("app.module.paths")*/
-    static function providePath() {
-        return dirname(self::getReflection()->getFileName());
+    static public function provideNamespace() {
+        return static::getReflection()->getNamespaceName();
     }
 }

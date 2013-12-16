@@ -1,10 +1,7 @@
 <?php
-namespace Spot\App\Rest;
+namespace Spot\App\REST;
 
-/**
- * @Annotation
- * @Target("METHOD")
- */
+/** @Annotation */
 final class Path {
     public $value;
 }

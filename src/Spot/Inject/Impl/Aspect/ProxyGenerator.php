@@ -1,161 +1,90 @@
 <?php
 namespace Spot\Inject\Impl\Aspect;
 
-use Spot\Reflect\Type;
+use Spot\Gen\CodeWriter;
+use Spot\Inject\Impl\BindingLocator;
+use Spot\Inject\Impl\Visitors\FactoryCompilerVisitor;
 use Spot\Reflect\Method;
-use Spot\Reflect\Parameter;
-use Spot\Code\CodeWriter;
-use Spot\Code\Impl\CodeWriterImpl;
-use Spot\Inject\Impl\Visitor\PhpCompiler;
+use Spot\Reflect\Type;
 
 class ProxyGenerator {
-    private $aspect;
-    
-    public function setAspect(AspectWeaver $aspect) {
+    private $pointCuts,
+            $locator,
+            $aspect;
+
+    public function __construct(
+            PointCuts $pointCuts,
+            BindingLocator $locator) {
+        $this->pointCuts = $pointCuts;
+        $this->locator = $locator;
+    }
+
+    public function setAspectWeaver(AspectWeaver $aspect) {
         $this->aspect = $aspect;
     }
-    
-    public function generate(Type $type, $proxyName, array $advices) {
-        $writer = new CodeWriterImpl();
-        
-        $writer->writeln('use Spot\Inject\Key;');
-        $writer->writeln('use Spot\Reflect\Reflection;');
-        $writer->writeln('use Spot\Inject\Impl\Modules;');
-        $writer->writeln('use Spot\Inject\Impl\InjectorImpl;');
-        $writer->writeln('use Spot\Inject\Impl\Aspect\DelegateInvocation;');
-        $writer->writeln('use Spot\Inject\Impl\Aspect\TerminalInvocation;');
-        $writer->newLine();
-        
-        $writer->write('class ');
-        $writer->write($proxyName);
-        $type->isInterface()
-                ? $writer->write(' implements \\')
-                : $writer->write(' extends \\');
-        
-        $writer->write($type->name);
-        $writer->write(' {');
+
+    public function generate(Type $type, CodeWriter $writer) {
+        $writer->write('function __construct($r, $d, $s) {');
         $writer->indent();
-        
-        $writer->writeln('public $r, $m, $i, $d;');
-        
-        $writer->write('function __construct(Reflection $reflection, InjectorImpl $injector, Modules $modules, \\');
-        $writer->write($type->name);
-        $writer->write(' $delegate');
-        $writer->write(') {');
-        $writer->indent();
-        $writer->writeln('$this->r = $reflection;');
-        $writer->writeln('$this->m = $modules;');
-        $writer->writeln('$this->i = $injector;');
-        $writer->write('$this->d = $delegate;');
+        $writer->writeln('$this->r = $r;');
+        $writer->writeln('$this->d = $d;');
+        $writer->write('$this->s = $s;');
         $writer->outdent();
-        $writer->writeln('}');
-        $writer->newLine();
-        
+        $writer->writeln("}");
+
         foreach($type->getMethods(Method::IS_PUBLIC) as $method) {
-            if(isset($advices[$method->name])) {
-                $this->generateMethod($method, $advices[$method->name], $writer);
-            } else if(!$method->isConstructor()) {
-                $writer->write("function {$method->name} (");
-                
-                $parameters = $method->getParameters();
-                if($parameters) {
-                    $this->generateParameter(array_shift($parameters), $writer);
-                    foreach($parameters as $parameter) {
-                        $writer->write(', ');
-                        $this->generateParameter($parameter, $writer);
-                    }
-                }
-                
-                $writer->write(') {');
-                $writer->indent();
-                $writer->write('return $this->d->');
-                $writer->write($method->name);
-                $writer->write('(');
-                
-                $parameters = $method->getParameters();
-                if($parameters) {
-                    $writer->write('$');
-                    $writer->write(array_shift($parameters)->name);
-                    foreach($parameters as $parameter) {
-                        $writer->write(', $');
-                        $writer->write($parameter->name);
-                    }
-                }
-                
-                $writer->write(');');
-                $writer->outdent();
-                $writer->write("}");
-                $writer->newLine();
-                $writer->newLine();
+            if(!$this->pointCuts->matches($method)) {
+                continue;
             }
+
+            $this->generateMethod($method, $this->pointCuts->getAdvices($method), $writer);
         }
-        
-        $writer->outdent();
-        $writer->write('}');
-        
-        return $writer->getCode();
     }
-    
+
     public function generateMethod(Method $method, array $advices, CodeWriter $writer) {
-        $writer->write('function ');
-        $writer->write($method->name);
-        $writer->write('(');
+        $writer->write("function ", $method->name, " (");
         $parameters = $method->getParameters();
         if($parameters) {
-            $this->generateParameter(array_shift($parameters), $writer);
-            
+            $parameter = array_shift($parameters);
+            if($parameter->getClass()) {
+                $writer->write($parameter->getClass()->name, " ");
+            } else if($parameter->isArray()) {
+                $writer->write("array ");
+            }
+            $writer->write('$', $parameter->name);
             foreach($parameters as $parameter) {
-                $writer->write(', ');
-                
-                $this->generateParameter($parameter, $writer);
+                if($parameter->getClass()) {
+                    $writer->write($parameter->getClass()->name, " ");
+                } else if($parameter->isArray()) {
+                    $writer->write("array ");
+                }
+                $writer->write('$s', $parameter->name);
             }
         }
-        
-        $writer->write(') {');
+        $writer->write(") {");
         $writer->indent();
-        
-        $writer->writeln('$i = $this->i;');
-        $writer->writeln('$m = $this->m;');
-        $writer->writeln('$s = $i->getSingletonPool();');
-        
-        $writer->write('return (');
-        for($i = count($advices); $i--;) {
-            $writer->indent();
-            $writer->write('new DelegateInvocation(');
+        $writer->writeln('$s = $this->s;');
+        $writer->write("return (");
+        foreach($advices as $advice) {
+            $writer->write("new DelegateInvocation(");
+
+            $advice->accept(new FactoryCompilerVisitor($writer, $this->locator, $this->aspect));
+
+            $writer->write(", ");
         }
-        
-        $writer->indent();
-        $writer->write('new TerminalInvocation($this->d, $this->r->getMethod($this->r->getType(');
-        $writer->writeValue($method->getType()->name);
-        $writer->write('), __FUNCTION__), func_get_args())');
-        
-        foreach(array_reverse($advices) as $advice) {
-            $writer->writeln(',');
-            $advice->accept(new PhpCompiler($writer, $this->aspect));
-            $writer->outdent();
-            $writer->write(')');
+
+        $writer->write("new TerminalInvocation(func_get_args(), ");
+        $writer->literal($method->getType()->name);
+        $writer->write(", ");
+        $writer->literal($method->name);
+        $writer->write(', $this->d, $this->r)');
+
+        foreach($advices as $advice) {
+            $writer->write(")");
         }
-        
+
+        $writer->write(")->proceed();");
         $writer->outdent();
-        $writer->write(')->proceed();');
-        
-        $writer->outdent();
-        $writer->write('}');
-    }
-    
-    public function generateParameter(Parameter $parameter, CodeWriter $writer) {
-        if(($class = $parameter->getClass())) {
-            $writer->write('\\');
-            $writer->write($class->name);
-            $writer->write(' ');
-        } else if($parameter->isArray()) {
-            $writer->write('array ');
-        }
-        $writer->write('$');
-        $writer->write($parameter->name);
-        if($parameter->isDefaultValueAvailable()) {
-            $writer->write(' = ');
-            $writer->writeValue($parameter->getDefaultValue());
-        }
+        $writer->write("}");
     }
 }

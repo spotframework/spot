@@ -1,42 +1,40 @@
 <?php
 namespace Spot\Inject\Impl;
 
-use Spot\Code\CodeStorage;
+use Spot\Gen\CodeStorage;
+use Spot\Gen\CodeWriter;
 
 class ModulesAdapterFactory {
     private $builder,
             $singletons,
-            $codeStorage;
-    
+            $storage;
+
     public function __construct(
-            BindingBuilder $builder,
-            SingletonPool $singletons,
-            CodeStorage $codeStorage) {
+            BindingsBuilder $builder,
+            Singletons $singletons,
+            CodeStorage $storage) {
         $this->builder = $builder;
         $this->singletons = $singletons;
-        $this->codeStorage = $codeStorage;
+        $this->storage = $storage;
     }
-    
-    public function getAdapterOf(Modules $modules) {
-        $className = 'ModuleAdapter__'.$modules->hash();
-        $fqcn = $this->codeStorage->load($className);
-        if(empty($fqcn)) {
-            $this->builder->build();
-            $size = $this->singletons->getSize();
-            
-            $code = '
 
-/**
- * Configured with
- *     '.$modules.'
- */
-class '.$className.' {
-    const SINGLETONS_SIZE = '.$size.';
-}';
-            
-            $fqcn = $this->codeStorage->store($className, $code);
+    public function get(Modules $modules) {
+        $adapter = "ModulesAdapter__".$modules->hash();
+        if($this->storage->load($adapter)) {
+            return $adapter;
         }
-        
-        return $fqcn;
+
+        $this->builder->build();
+
+        $writer = new CodeWriter();
+        $writer->write("class ", $adapter, " {");
+        $writer->indent();
+            $writer->write("const SINGLETONS_SIZE = ", $this->singletons->getSize(), ";");
+        $writer->outdent();
+        $writer->write("}");
+
+        $this->storage->store($adapter, $writer);
+
+        return $adapter;
     }
 }

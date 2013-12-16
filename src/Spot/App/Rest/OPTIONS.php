@@ -1,12 +1,12 @@
 <?php
-namespace Spot\App\Rest;
+namespace Spot\App\REST;
 
-use Spot\Http\Request;
-use Spot\App\Rest\Impl\RequestMethod;
+use Spot\App\REST\Impl\RequestMethod;
+use Spot\App\Web\Request;
 
 /** @Annotation */
-final class OPTIONS implements RequestMethod {
-    public function __toString() {
+class OPTIONS implements RequestMethod {
+    function __toString() {
         return Request::OPTIONS;
-    }    
+    }
 }

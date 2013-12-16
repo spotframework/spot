@@ -1,30 +1,29 @@
 <?php
 namespace Spot\Inject\Impl\Aspect;
 
-use Spot\Reflect\Type;
+use Spot\Inject\Binding;
 use Spot\Reflect\Method;
-use Spot\Inject\Impl\Binding;
 
 class PointCut {
-    private $matcher,
-            $binding;
-    
-    public function __construct(array $matcher, Binding $binding) {
-        $this->matcher = $matcher;
-        $this->binding = $binding;
+    private $matchers,
+            $advice;
+
+    public function __construct(array $matchers, Binding $advice) {
+        $this->matchers = $matchers;
+        $this->advice = $advice;
     }
-    
-    public function getBinding() {
-        return $this->binding;
-    }
-    
+
     public function matches(Method $method) {
-        foreach($this->matcher as $matcher) {
-            if($matcher->matches($method)) {
-                return true;
+        foreach($this->matchers as $matcher) {
+            if(!$matcher->matches($method)) {
+                return false;
             }
         }
-        
-        return false;
+
+        return true;
+    }
+
+    public function getAdvice() {
+        return $this->advice;
     }
 }

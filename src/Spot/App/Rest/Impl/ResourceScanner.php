@@ -1,30 +1,52 @@
 <?php
-namespace Spot\App\Rest\Impl;
+namespace Spot\App\REST\Impl;
 
-use Spot\Inject\Named;
+use Spot\App\REST\Path;
+use Spot\App\Web\Impl\Router\InvertedIndex\ActionMapping;
+use Spot\App\Web\Impl\Router\InvertedIndex\ControllerScanner;
+use Spot\App\Web\Route;
 use Spot\Reflect\Match;
+use Spot\Reflect\Method;
 use Spot\Reflect\Reflection;
+use Spot\Inject\Named;
 
-class ResourceScanner {
+class ResourceScanner extends ControllerScanner {
     private $reflection,
             $namespaces;
 
     public function __construct(
             Reflection $reflection,
-            /** @Named("app.module.namespaces") */array $namespaces) {
+            /** @Named("app.module.namespaces") */array $namespaces = []) {
         $this->reflection = $reflection;
         $this->namespaces = $namespaces;
     }
 
     public function scan() {
-        $resources = [];
-        $matcher = Match::annotatedWith("Spot\App\Rest\Resource");
+        $mappings = [];
+        $matcher = Match::annotatedWith("Spot\\App\\REST\\Resource");
         foreach($this->namespaces as $ns) {
-            $resources = array_merge(
-                $resources,
-                $this->reflection->find($ns, $matcher)
-            );
+            foreach($this->reflection->find($ns, $matcher) as $type) {
+                $resource = $type->getAnnotation("Spot\\App\\REST\\Resource");
+                foreach($type->getMethods(Method::IS_PUBLIC) as $method) {
+                    if(!$method->isAnnotatedWith("Spot\\App\\REST\\Impl\\RequestMethod")) {
+                        continue;
+                    }
+
+                    $path = $method->getAnnotation("Spot\\App\\REST\\Path") ?: new Path();
+
+                    $route = new Route();
+
+                    $route->value = $resource->value.$path->value;
+                    $route->method = (string)$method->getAnnotation("Spot\\App\\REST\\Impl\\RequestMethod");
+
+                    $mappings[] = new ActionMapping(
+                        $route,
+                        $method->getType()->name."::".$method->name
+                    );
+                }
+            }
         }
-        return $resources;
+
+        return $mappings;
     }
 }

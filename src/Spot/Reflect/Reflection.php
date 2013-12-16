@@ -3,32 +3,17 @@ namespace Spot\Reflect;
 
 interface Reflection {
     /**
-     * @return \Spot\Reflect\Type
+     * @param string $type
+     * @return Type
      */
-    function getType($name);
-    
+    function get($type);
+
     /**
-     * @return \Spot\Reflect\Method
-     */
-    function getMethod(Type $type, $name);
-    
-    /**
-     * @return \Spot\Reflect\Parameter
-     */
-    function getParameter(Method $method, $name);
-    
-    /**
-     * @return array 
-     */
-    function getAnnotations(Annotated $annotated);
-    
-    /**
-     * Find types in given namespace that matches given matcher criteria
-     * 
      * @param string $namespace
      * @param Matcher $matcher
-     * 
-     * @return array
+     * @return Type[]
      */
     function find($namespace, Matcher $matcher);
+
+    function getAnnotations(Annotated $annotated);
 }

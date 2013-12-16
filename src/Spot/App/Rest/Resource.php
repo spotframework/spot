@@ -1,12 +1,7 @@
 <?php
-namespace Spot\App\Rest;
+namespace Spot\App\REST;
 
-/** @Annotation */
+/** @Annotation @Target("CLASS")*/
 class Resource {
-    /**
-     * Resource uri
-     * 
-     * @var string
-     */
     public $value;
 }

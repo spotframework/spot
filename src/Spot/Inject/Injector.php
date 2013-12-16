@@ -3,7 +3,7 @@ namespace Spot\Inject;
 
 interface Injector {
     /**
-     * Get injected instance from the injector
+     * Get injected instance represented by given key
      *
      * @param Key $key
      * @return mixed
@@ -11,33 +11,18 @@ interface Injector {
     function get(Key $key);
 
     /**
-     * Alias of get(Key::ofType($typeName))
+     * Alias of get(Key::ofType($type))
      *
-     * @param string $typeName
+     * @param string $type
      * @return mixed
      */
-    function getInstance($typeName);
+    function getInstance($type);
 
     /**
-     * Get lazy proxy instance
+     * Create a child injector which inherits bindings from this injector
      *
-     * @param TypeKey $key
-     * @return mixed
-     */
-    function getLazy(TypeKey $key);
-    
-    /**
-     * Produce child injector which inherits all parent injector configurations
-     * 
      * @param array $modules
      * @return Injector
      */
     function fork(array $modules);
-    
-    /**
-     * Return modules used to configure this injector
-     * 
-     * @return array
-     */
-    function getModules();
 }

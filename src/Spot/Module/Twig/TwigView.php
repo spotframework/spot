@@ -4,12 +4,12 @@ namespace Spot\Module\Twig;
 use Spot\App\Web\View;
 
 class TwigView implements View {
-    private $template,
-            $model;
+    private $model,
+            $template;
 
     public function __construct($template, array $model = []) {
-        $this->template = $template;
         $this->model = $model;
+        $this->template = $template;
     }
 
     public function getModel() {

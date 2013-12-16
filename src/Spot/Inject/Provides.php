@@ -1,10 +1,15 @@
 <?php
 namespace Spot\Inject;
 
-/** @Annotation */
-class Provides {
-    const ELEMENT = 'array';
-    const CONSTANT = 'const';
-    
-    public $value = self::CONSTANT;
+/**
+ * @Annotation
+ * @Target("METHOD")
+ */
+final class Provides {
+    const ELEMENT = "array";
+    const CONSTANT = "const";
+
+    public $value = Provides::CONSTANT;
+
+    public $overrides = false;
 }

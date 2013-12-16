@@ -1,89 +1,87 @@
 <?php
 namespace Spot\Reflect\Impl;
 
+use Spot\Reflect\Annotated;
+use Spot\Reflect\Func;
+use Spot\Reflect\Impl\Annotation\CachedReader;
+use Spot\Reflect\Impl\Annotation\Reader;
+use Spot\Reflect\Impl\Annotation\ReaderImpl;
+use Spot\Reflect\Matcher;
 use Spot\Reflect\Reflection;
 use Spot\Reflect\Type;
-use Spot\Reflect\Method;
-use Spot\Reflect\Parameter;
-use Spot\Reflect\Matcher;
-use Spot\Reflect\Annotated;
-use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Doctrine\Common\Annotations\AnnotationReader as DoctrineReader;
+use Doctrine\Common\Cache\Cache;
 
 class ReflectionImpl implements Reflection {
-    private $annotationReader,
-            $nsLoader;
-    
-    public function __construct(
-            AnnotationReader $annotationReader,
-            NamespaceLoader $nsLoader) {
-        $this->annotationReader = $annotationReader;
-        $this->nsLoader = $nsLoader;
+    private $cache,
+            $reader,
+            $scanner,
+            $types = [];
+
+    protected function __construct(
+            Cache $cache,
+            Reader $reader,
+            TypeScanner $scanner) {
+        $this->cache = $cache;
+        $this->reader = $reader;
+        $this->scanner = $scanner;
     }
-    
-    public function find($namespace, Matcher $matcher) {
-        $this->nsLoader->load($namespace);        
-        $declaredTypes = array_merge(
-            get_declared_classes(),
-            get_declared_interfaces()
+
+    function get($type) {
+        return isset($this->types[$type])
+            ? $this->types[$type]
+            : $this->types[$type] = new Type($type, $this);
+    }
+
+    function find($namespace, Matcher $matcher) {
+        $id = "#types#{$namespace}#".md5(serialize($matcher));
+        if(($names = $this->cache->fetch($id)) !== false) {
+            return array_map([$this, "get"], $names);
+        }
+
+        $names = $this->scanner->scan($namespace);
+        $matches = array_filter(
+            array_map([$this, "get"], $names),
+            [$matcher, "matches"]
         );
-        
-        $matchedTypes = [];
-        foreach($declaredTypes as $typeName) {
-            if(strpos($typeName, $namespace) === 0) {
-                $type = $this->getType($typeName);
-                if($matcher->match($type)) {
-                    $matchedTypes[] = $type;
-                }
-            }
-        }
-        
-        return $matchedTypes;
+
+        $this->cache->save($id, array_map(function($type) {
+            return $type->name;
+        }, $matches));
+
+        return $matches;
     }
 
-    public function getAnnotations(Annotated $annotated) {
+    function getAnnotations(Annotated $annotated) {
         if($annotated instanceof \ReflectionClass) {
-            return $this->annotationReader->getClassAnnotations($annotated);
+            return $this->reader->getClassAnnotations($annotated);
         }
-        
+
         if($annotated instanceof \ReflectionMethod) {
-            return $this->annotationReader->getMethodAnnotations($annotated);
+            return $this->reader->getMethodAnnotations($annotated);
         }
-        
+
         if($annotated instanceof \ReflectionParameter) {
-            return $this->annotationReader->getParameterAnnotations($annotated);
+            return $this->reader->getParameterAnnotations($annotated);
         }
-        
+
         if($annotated instanceof \ReflectionProperty) {
-            return $this->annotationReader->getPropertyAnnotations($annotated);
+            return $this->reader->getPropertyAnnotations($annotated);
         }
     }
 
-    public function getMethod(Type $type, $name) {
-        return new Method($type, $name, $this);
-    }
 
-    public function getParameter(Method $method, $name) {
-        return new Parameter($method, $name, $this);
-    }
-
-    public function getType($name) {
-        return new Type($name, $this);
-    }    
-    
     static public function create(Cache $cache) {
-        foreach(spl_autoload_functions() as $callable) {
-            AnnotationRegistry::registerLoader($callable);
+        foreach(spl_autoload_functions() as $loader) {
+            AnnotationRegistry::registerLoader($loader);
         }
-        
-        $doctrineReader = new DoctrineReader();
-        $doctrineReader = new CachedReader($doctrineReader, $cache);
-        $reader = new AnnotationReader($doctrineReader);
-        $phpLoader = new PhpLoader();
-        $nsLoader = new NamespaceLoader($phpLoader);
-        
-        return new self($reader, $nsLoader);
+
+        $reader = new ReaderImpl(new AnnotationReader());
+        $reader = new CachedReader($cache, $reader);
+        $loader = new PhpFileLoader();
+        $scanner = new TypeScanner($loader);
+
+        return new ReflectionImpl($cache, $reader, $scanner);
     }
 }

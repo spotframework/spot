@@ -1,34 +1,31 @@
 <?php
 namespace Spot\Domain\Impl;
 
-use Spot\Log\Log;
-use Spot\Domain\DomainManager;
-use Spot\Aspect\Intercept\MethodInvocation;
 use Spot\Aspect\Intercept\MethodInterceptor;
+use Spot\Aspect\Intercept\MethodInvocation;
+use Spot\Domain\Domain;
 
 class TransactionalInterceptor implements MethodInterceptor {
     private $domain,
-            $lock = 0;
-    
-    public function __construct(DomainManager $domain) {
+            $level = 0;
+
+    public function __construct(Domain $domain) {
         $this->domain = $domain;
     }
-    
-    public function intercept(MethodInvocation $invocation) {
+
+    function intercept(MethodInvocation $invocation) {
+        $this->level++ && $this->domain->beginTransaction();
+
         try {
-            $this->lock or $this->domain->begin();
-            
-            ++$this->lock;
-            
             $result = $invocation->proceed();
-            
-            --$this->lock or $this->domain->commit();
-            
+
+            --$this->level || $this->domain->commit();
+
             return $result;
         } catch(\Exception $e) {
-            --$this->lock or $this->domain->rollback();
-            
+            --$this->level || $this->domain->rollback();
+
             throw $e;
         }
-    }    
+    }
 }

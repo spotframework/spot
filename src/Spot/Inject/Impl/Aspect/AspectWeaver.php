@@ -1,71 +1,75 @@
 <?php
 namespace Spot\Inject\Impl\Aspect;
 
-use Spot\Reflect\Type;
+use Spot\Gen\CodeStorage;
+use Spot\Gen\CodeWriter;
+use Spot\Inject\Impl\BindingLocator;
+use Spot\Inject\Impl\Modules;
+use Spot\Inject\Impl\Singletons;
+use Spot\Inject\Injector;
+use Spot\Reflect\Method;
 use Spot\Reflect\Reflection;
-use Spot\Code\CodeStorage;
+use Spot\Reflect\Type;
 
 class AspectWeaver {
-    private $pointCuts,
+    private $modules,
+            $storage,
             $reflection,
-            $factory;
-    
+            $proxyGen;
+
     public function __construct(
-            PointCuts $pointCuts,
+            Modules $modules,
+            CodeStorage $storage,
             Reflection $reflection,
-            ProxyFactory $factory) {
-        $this->pointCuts = $pointCuts;
+            ProxyGenerator $proxyGen,
+            PointCuts $pointCuts) {
+        $this->modules = $modules;
+        $this->storage = $storage;
         $this->reflection = $reflection;
-        $this->factory = $factory;
-    }
-    
-    public function getPointCuts() {
-        return $this->pointCuts;
-    }
-    
-    public function getGenerator() {
-        return $this->factory->getGenerator();
-    }
-    
-    public function isInterceptedNamed($typeName) {
-        return $this->isIntercepted($this->reflection->getType($typeName));
-    }
-    
-    public function isIntercepted(Type $type) {
-        return (bool)$this->pointCuts->getTypeAdvices($type);
-    }
-    
-    public function getProxyNamed($typeName) {
-        return $this->getProxy($this->reflection->getType($typeName));
-    }
-    
-    public function getProxy(Type $type) {
-        return $this->factory->getProxy($type);
+        $this->proxyGen = $proxyGen;
+        $this->pointCuts = $pointCuts;
     }
 
-    public function isConstructorIntercepted(Type $type) {
+    public function get($className, $delegate, Singletons $singletons) {
+        $proxy = "AspectProxy__".$this->modules->hash()."__".md5($className);
+        if(!$this->storage->load($proxy)) {
+            $writer = CodeWriter::create();
 
+            $writer->writeln("use Spot\\Inject\\Impl\\Aspect\\DelegateInvocation;");
+            $writer->writeln("use Spot\\Inject\\Impl\\Aspect\\TerminalInvocation;");
+
+            $writer->write("class ", $proxy, " extends ", $className, " {");
+            $writer->indent();
+            $this->proxyGen->generate($this->reflection->get($className), $writer);
+            $writer->outdent();
+            $writer->write("}");
+
+            $this->storage->store($proxy, $writer);
+        }
+
+        return new $proxy($this->reflection, $delegate, $singletons);
     }
 
-    public function isMethodIntercepted(Type $type) {
+    public function check(Type $type) {
+        foreach($type->getMethods(Method::IS_PUBLIC) as $method) {
+            if($this->pointCuts->matches($method)) {
+                return true;
+            }
+        }
 
+        return false;
     }
 
-    public function getMethodInterceptionProxy(Type $type) {
+    static public function create(
+            Modules $modules,
+            CodeStorage $storage,
+            Reflection $reflection,
+            PointCuts $pointCuts,
+            BindingLocator $locator) {
+        $proxyGen = new ProxyGenerator($pointCuts, $locator);
+        $aspect = new AspectWeaver($modules, $storage, $reflection, $proxyGen, $pointCuts);
+        $proxyGen->setAspectWeaver($aspect);
 
-    }
-
-    public function getConstructorInterceptionFactory(Type $type) {
-
-    }
-    
-    static public function create(Reflection $reflection, CodeStorage $codeStorage) {
-        $pointCuts = new PointCuts();
-        $aspectGen = new ProxyGenerator();
-        $aspectFactory = new ProxyFactory($codeStorage, $pointCuts, $aspectGen);
-        $aspect = new AspectWeaver($pointCuts, $reflection, $aspectFactory);
-        $aspectGen->setAspect($aspect);
-        
         return $aspect;
     }
 }

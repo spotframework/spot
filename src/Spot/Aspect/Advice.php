@@ -2,5 +2,5 @@
 namespace Spot\Aspect;
 
 interface Advice {
-    
+
 }

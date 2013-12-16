@@ -1,31 +1,16 @@
 <?php
 namespace Spot\App\Web;
 
-/** @Annotation */
+/**
+ * @Annotation
+ * @Target({"METHOD", "CLASS"})
+ */
 class Route {
     public $value;
-    
-    /**
-     * Request method(s)
-     * 
-     * @var mixed
-     */
-    public $method;
 
-    /** @var boolean */
     public $ajax;
 
-    /**
-     * Required params
-     *
-     * @var array
-     */
-    public $params = [];
+    public $method;
 
-    /**
-     * Optional route name
-     *
-     * @var string
-     */
     public $name;
 }

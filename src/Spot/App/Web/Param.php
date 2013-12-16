@@ -2,11 +2,6 @@
 namespace Spot\App\Web;
 
 /** @Annotation */
-final class Param {
-    /**
-     * Request param name
-     * 
-     * @var string
-     */
+class Param {
     public $value;
 }

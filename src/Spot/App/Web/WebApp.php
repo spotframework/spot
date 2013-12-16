@@ -1,12 +1,9 @@
 <?php
 namespace Spot\App\Web;
 
-use Spot\Http\Request;
-
-interface WebApp {    
+interface WebApp {
     /**
-     * Transform request object into appropriate response object
-     *
+     * @param Request $request
      * @return Response
      */
     function handle(Request $request);

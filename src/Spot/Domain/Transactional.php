@@ -3,9 +3,11 @@ namespace Spot\Domain;
 
 use Spot\Inject\Qualifier;
 
-/** @Annotation */
+/**
+ * @Annotation
+ */
 final class Transactional implements Qualifier {
-    public function __toString() {
+    function __toString() {
         return "@".__CLASS__;
-    }    
+    }
 }

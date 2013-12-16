@@ -1,33 +1,43 @@
 <?php
 namespace Spot\Inject\Impl\Aspect;
 
-use Spot\Reflect\Method;
 use Spot\Aspect\Intercept\MethodInvocation;
+use Spot\Reflect\Reflection;
 
 class TerminalInvocation implements MethodInvocation {
-    public $d, $k, $m, $a;
-    
-    public function __construct(
-            $delegate,
-            Method $method,
-            array $arguments) {
-        $this->d = $delegate;
+    public $c, $m, $a, $d, $r;
+
+    public function __construct(array $args, $class, $method, $delegate, Reflection $reflection) {
+        $this->a = $args;
+        $this->c = $class;
         $this->m = $method;
-        $this->a = $arguments;
+        $this->d = $delegate;
+        $this->r = $reflection;
     }
-    
-    public function getArguments() {
+
+    function getArguments() {
         return $this->a;
     }
 
-    public function getMethod() {
-        return $this->m;
+    function proceed() {
+        switch(count($this->a)) {
+            case 0:
+                return $this->d->{$this->m}();
+            case 1:
+                return $this->d->{$this->m}($this->a[0]);
+            case 2:
+                return $this->d->{$this->m}($this->a[0], $this->a[1]);
+            case 3:
+                return $this->d->{$this->m}($this->a[0], $this->a[1], $this->a[2]);
+            default:
+                return call_user_func_array(
+                    [$this->d, $this->m],
+                    $this->a
+                );
+        }
     }
 
-    public function proceed() {
-        return call_user_func_array(
-            [$this->d, $this->m->name],
-            $this->getArguments()
-        );
-    }    
+    function getMethod() {
+        return $this->r->get($this->c)->getMethod($this->m);
+    }
 }

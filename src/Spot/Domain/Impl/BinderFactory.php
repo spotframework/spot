@@ -1,33 +1,45 @@
 <?php
 namespace Spot\Domain\Impl;
 
-use Spot\Reflect\Reflection;
-use Spot\Code\CodeStorage;
+use Spot\Gen\CodeStorage;
+use Spot\Gen\CodeWriter;
 
 class BinderFactory {
-    private $gen,
-            $reflection,
-            $codeStorage;
-    
+    private $storage,
+            $gen;
+
     public function __construct(
-            BinderGenerator $gen, 
-            Reflection $reflection,
-            CodeStorage $codeStorage) {
+            CodeStorage $storage,
+            BinderGenerator $gen) {
+        $this->storage = $storage;
         $this->gen = $gen;
-        $this->reflection = $reflection;
-        $this->codeStorage = $codeStorage;
     }
-    
-    public function getBinder($className) {
-        $binderName = 'Binder__'.md5($className);
-        $fqcn = $this->codeStorage->load($binderName);
-        if(empty($fqcn)) {
-            $type = $this->reflection->getType($className);
-            $code = $this->gen->generate($type);
-            
-            $fqcn = $this->codeStorage->store($binderName, $code);
+
+    public function getBinder($domainName) {
+        $binder = "DomainBinder__".md5($domainName);
+        if($this->storage->load($binder)) {
+            return $binder;
         }
-        
-        return $fqcn;
+
+        $writer = new CodeWriter();
+        $writer->write("class ", $binder, "{");
+        $writer->indent();
+            $writer->write('static function newInstance($d, $n, $b) {');
+            $writer->indent();
+                $this->gen->generateNewInstance($domainName, $writer);
+            $writer->outdent();
+            $writer->writeln("}");
+
+            $writer->write('static function bind($d, $i, $b) {');
+            $writer->indent();
+                $this->gen->generateBind($domainName, $writer);
+            $writer->outdent();
+            $writer->writeln("}");
+        $writer->outdent();
+        $writer->write("}");
+
+        $this->storage->store($binder, $writer);
+
+        return $binder;
     }
 }
