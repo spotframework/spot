@@ -12,7 +12,12 @@ abstract class DoctrineORMRepository implements Repository {
     }
 
     function all() {
-        return $this->em->createQueryBuilder();
+        $className = static::repositoryOf();
+        $alias = strtolower($className[strrpos($className, "\\") + 1]);
+
+        return (new DoctrineORMQuery($this->em))
+            ->addSelect($alias)
+            ->from($className, $alias);
     }
 
     function find($id) {

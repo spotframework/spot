@@ -1,0 +1,15 @@
+<?php
+namespace Spot\Module\Doctrine\ORM;
+
+use Doctrine\ORM\QueryBuilder;
+
+class DoctrineORMQuery extends QueryBuilder
+        implements \IteratorAggregate, \Countable {
+    public function getIterator() {
+        return $this->getQuery()->execute();
+    }
+
+    public function count() {
+        return count($this->getIterator());
+    }
+}
