@@ -66,6 +66,14 @@ abstract class InvertedIndexRouter implements Router {
 
     function generate($name, array $params = []) {
         if(isset($this->names[$name])) {
+            if(count($params) !== count($this->names[$name]["params"])) {
+                throw new \InvalidArgumentException(
+                    "Route \"{$name}\" requires ".
+                    count($this->names[$name]["params"]).
+                    " parameters, ".count($params)." given"
+                );
+            }
+
             if(key($params) === 0) {
                 $params = array_combine(
                     $this->names[$name]["params"],
