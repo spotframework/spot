@@ -16,11 +16,6 @@ class DomainModule {
         return $domain;
     }
 
-    /** @Provides(Provides::ELEMENT) @Named("symfony.console.commands") */
-    static public function provideCommand(FindCommand $command) {
-        return $command;
-    }
-
     /** @Intercept(@AnnotatedWith(@Transactional)) */
     static public function provideTransactionalInterceptor(TransactionalInterceptor $interceptor) {
         return $interceptor;
