@@ -1,8 +1,10 @@
 <?php
 namespace Spot\Domain;
 
+use Spot\Domain\Impl\Command\FindCommand;
 use Spot\Domain\Impl\DomainImpl;
 use Spot\Domain\Impl\TransactionalInterceptor;
+use Spot\Inject\Named;
 use Spot\Inject\Provides;
 use Spot\Inject\Singleton;
 use Spot\Inject\Intercept;
@@ -12,6 +14,11 @@ class DomainModule {
     /** @Provides("Spot\Domain\Domain") @Singleton */
     static public function provideDomain(DomainImpl $domain) {
         return $domain;
+    }
+
+    /** @Provides(Provides::ELEMENT) @Named("symfony.console.commands") */
+    static public function provideCommand(FindCommand $command) {
+        return $command;
     }
 
     /** @Intercept(@AnnotatedWith(@Transactional)) */

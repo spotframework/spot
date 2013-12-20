@@ -22,15 +22,17 @@ class AspectWeaver {
             CodeStorage $storage,
             Reflection $reflection,
             ProxyGenerator $proxyGen,
+            Singletons $singletons,
             PointCuts $pointCuts) {
         $this->modules = $modules;
         $this->storage = $storage;
         $this->reflection = $reflection;
         $this->proxyGen = $proxyGen;
+        $this->singletons = $singletons;
         $this->pointCuts = $pointCuts;
     }
 
-    public function get($className, $delegate, Singletons $singletons) {
+    public function get($className, $delegate, Injector $injector) {
         $proxy = "AspectProxy__".$this->modules->hash()."__".md5($className);
         if(!$this->storage->load($proxy)) {
             $writer = CodeWriter::create();
@@ -47,7 +49,7 @@ class AspectWeaver {
             $this->storage->store($proxy, $writer);
         }
 
-        return new $proxy($this->reflection, $delegate, $singletons);
+        return new $proxy($this->singletons, $this->modules, $injector, $this->reflection, $delegate);
     }
 
     public function check(Type $type) {
@@ -65,9 +67,10 @@ class AspectWeaver {
             CodeStorage $storage,
             Reflection $reflection,
             PointCuts $pointCuts,
+            Singletons $singletons,
             BindingLocator $locator) {
         $proxyGen = new ProxyGenerator($pointCuts, $locator);
-        $aspect = new AspectWeaver($modules, $storage, $reflection, $proxyGen, $pointCuts);
+        $aspect = new AspectWeaver($modules, $storage, $reflection, $proxyGen, $singletons, $pointCuts);
         $proxyGen->setAspectWeaver($aspect);
 
         return $aspect;

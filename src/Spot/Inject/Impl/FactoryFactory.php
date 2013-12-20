@@ -127,7 +127,7 @@ class FactoryFactory {
         $adapter = $modulesAdapter->get($modules);
         $singletons->setSize($adapter::SINGLETONS_SIZE);
 
-        $aspect = AspectWeaver::create($modules, $storage, $reflection, $pointCuts, $locator);
+        $aspect = AspectWeaver::create($modules, $storage, $reflection, $pointCuts, $singletons, $locator);
 
         return new FactoryFactory($modules, $locator, $builder, $storage, $reflection, $aspect);
     }

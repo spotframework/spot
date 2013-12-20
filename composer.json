@@ -5,8 +5,9 @@
         "doctrine/common":"*"
     },
     "suggest":{
-        "monolog/monolog":"*",
-        "symfony/validator":"2.4"
+        "monolog/monolog": "*",
+        "symfony/validator": "*",
+        "symfony/yaml": "*"
     },
     "autoload":{
         "psr-0":{

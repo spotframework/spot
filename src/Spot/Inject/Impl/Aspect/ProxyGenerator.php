@@ -5,6 +5,7 @@ use Spot\Gen\CodeWriter;
 use Spot\Inject\Impl\BindingLocator;
 use Spot\Inject\Impl\Visitors\FactoryCompilerVisitor;
 use Spot\Reflect\Method;
+use Spot\Reflect\Parameter;
 use Spot\Reflect\Type;
 
 class ProxyGenerator {
@@ -24,11 +25,13 @@ class ProxyGenerator {
     }
 
     public function generate(Type $type, CodeWriter $writer) {
-        $writer->write('function __construct($r, $d, $s) {');
+        $writer->write('function __construct($s, $m, $i, $r, $d) {');
         $writer->indent();
+        $writer->writeln('$this->s = $s;');
+        $writer->writeln('$this->m = $m;');
+        $writer->writeln('$this->i = $i;');
         $writer->writeln('$this->r = $r;');
-        $writer->writeln('$this->d = $d;');
-        $writer->write('$this->s = $s;');
+        $writer->write('$this->d = $d;');
         $writer->outdent();
         $writer->writeln("}");
 
@@ -45,26 +48,19 @@ class ProxyGenerator {
         $writer->write("function ", $method->name, " (");
         $parameters = $method->getParameters();
         if($parameters) {
-            $parameter = array_shift($parameters);
-            if($parameter->getClass()) {
-                $writer->write($parameter->getClass()->name, " ");
-            } else if($parameter->isArray()) {
-                $writer->write("array ");
-            }
-            $writer->write('$', $parameter->name);
+            $this->generateParameter(array_shift($parameters), $writer);
             foreach($parameters as $parameter) {
-                if($parameter->getClass()) {
-                    $writer->write($parameter->getClass()->name, " ");
-                } else if($parameter->isArray()) {
-                    $writer->write("array ");
-                }
-                $writer->write('$s', $parameter->name);
+                $writer->write(", ");
+                $this->generateParameter($parameter, $writer);
             }
         }
         $writer->write(") {");
         $writer->indent();
         $writer->writeln('$s = $this->s;');
+        $writer->writeln('$m = $this->m;');
+        $writer->writeln('$i = $this->i;');
         $writer->write("return (");
+        $writer->indent();
         foreach($advices as $advice) {
             $writer->write("new DelegateInvocation(");
 
@@ -82,9 +78,18 @@ class ProxyGenerator {
         foreach($advices as $advice) {
             $writer->write(")");
         }
-
+        $writer->outdent();
         $writer->write(")->proceed();");
         $writer->outdent();
         $writer->write("}");
+    }
+
+    public function generateParameter(Parameter $parameter, CodeWriter $writer) {
+        if($parameter->getClass()) {
+            $writer->write($parameter->getClass()->name, " ");
+        } else if($parameter->isArray()) {
+            $writer->write("array ");
+        }
+        $writer->write('$', $parameter->name);
     }
 }

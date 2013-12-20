@@ -1,6 +1,7 @@
 <?php
 namespace Spot;
 
+use Spot\App\Web\WebApp;
 use Spot\Module\Spot\SpotModule;
 use Spot\Gen\CodeStorage;
 use Spot\Inject\Impl\InjectorImpl;
@@ -73,6 +74,11 @@ final class Spot {
         );
     }
 
+    /**
+     * Create a spot web app instance
+     *
+     * @return WebApp
+     */
     public function createWebApp() {
         $modules = array_merge(array_merge(
             ["Spot\\App\\Web\\WebAppModule"],

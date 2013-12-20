@@ -49,7 +49,7 @@ class RepositoryLocator {
 
         // search class inheritance hierarchies
         $candidates = [];
-        $classParents = array_values(class_parents($className));
+        $classParents = array_values(class_parents($className) ?: []);
         foreach($repos as $repo) {
             $repoName = $repo->name;
             $index = array_search($repoName::repositoryOf(), $classParents);

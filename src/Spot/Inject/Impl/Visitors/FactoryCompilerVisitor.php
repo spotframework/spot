@@ -83,7 +83,7 @@ class FactoryCompilerVisitor extends AbstractVisitor {
         $this->writer->write(")");
 
         if($this->aspect->check($inline->getType())) {
-            $this->writer->write(', $s)');
+            $this->writer->write(', $i)');
         }
     }
 
