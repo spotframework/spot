@@ -13,7 +13,7 @@ abstract class DoctrineORMRepository implements Repository {
 
     function all() {
         $className = static::repositoryOf();
-        $alias = strtolower($className[strrpos($className, "\\") + 1]);
+        $alias = lcfirst(substr($className, strrpos($className, "\\") + 1));
 
         return (new DoctrineORMQuery($this->em))
             ->addSelect($alias)
