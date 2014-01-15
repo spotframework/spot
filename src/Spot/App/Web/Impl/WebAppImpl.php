@@ -11,22 +11,34 @@ use Spot\Inject\Named;
 class WebAppImpl implements WebApp {
     private $router,
             $dispatcher,
-            $headers,
-            $renderers;
+            $renderers,
+
+            $responseCode,
+            $responseHeaders,
+            $httpVersion;
 
     public function __construct(
             Router $router,
             Dispatcher $dispatcher,
-            /** @Named("app.web.response-headers") */$headers = [],
-            /** @Named("app.web.view-renderers") */array $renderers = []) {
+            /** @Named("app.web.view-renderers") */array $renderers = [],
+            /** @Named("app.web.response.code") */$responseCode = Response::OK,
+            /** @Named("app.web.response.headers") */$responseHeaders = [],
+            /** @Named("app.web.response.http-version") */$httpVersion = "HTTP/1.1") {
         $this->router = $router;
         $this->dispatcher = $dispatcher;
-        $this->headers = $headers;
         $this->renderers = $renderers;
+
+        $this->responseCode = $responseCode;
+        $this->responseHeaders = $responseHeaders;
+        $this->httpVersion = $httpVersion;
     }
 
     function handle(Request $request) {
-        $response = new Response(Response::OK, $this->headers);
+        $response = new Response(
+            $this->responseCode,
+            $this->responseHeaders,
+            $this->httpVersion
+        );
 
         $action = $this->router->resolve($request);
         if(empty($action)) {
