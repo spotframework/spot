@@ -6,7 +6,7 @@ use Doctrine\ORM\QueryBuilder;
 class DoctrineORMQuery extends QueryBuilder
         implements \IteratorAggregate, \Countable {
     public function getIterator() {
-        return $this->getQuery()->execute();
+        return new \ArrayIterator($this->getQuery()->getResult());
     }
 
     public function count() {
