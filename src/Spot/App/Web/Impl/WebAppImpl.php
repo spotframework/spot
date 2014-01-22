@@ -1,6 +1,7 @@
 <?php
 namespace Spot\App\Web\Impl;
 
+use Spot\App\Web\HttpException;
 use Spot\App\Web\Request;
 use Spot\App\Web\Response;
 use Spot\App\Web\Router;
@@ -40,23 +41,29 @@ class WebAppImpl implements WebApp {
             $this->httpVersion
         );
 
-        $action = $this->router->resolve($request);
-        if(empty($action)) {
-            $response->setHttpCode(Response::NOT_FOUND);
-
-            return $response;
-        }
-
-        $view = $this->dispatcher->dispatch($action, $request, $response);
-        if($view !== null) {
-            if(is_array($view) || is_scalar($view)) {
-                $view = new ScalarView($view);
+        try {
+            $action = $this->router->resolve($request);
+            if(empty($action)) {
+                throw new HttpException("Page not found !!", Response::NOT_FOUND);
             }
 
-            foreach($this->renderers as $renderer) {
-                $renderer::rendererOf($view) &&
-                    $renderer->render($view, $request, $response);
+            $view = $this->dispatcher->dispatch($action, $request, $response);
+            if($view !== null) {
+                if(is_array($view) || is_scalar($view)) {
+                    $view = new ScalarView($view);
+                }
+
+                foreach($this->renderers as $renderer) {
+                    $renderer::rendererOf($view) &&
+                        $renderer->render($view, $request, $response);
+                }
             }
+        } catch(HttpException $e) {
+            $response->setHttpCode($e->getCode());
+            $response->write($e->getMessage());
+        } catch(\Exception $e) {
+            $response->setHttpCode(Response::INTERNAL_SERVER_ERROR);
+            $response->write($e->getMessage());
         }
 
         return $response;
