@@ -82,6 +82,8 @@ class ProxyGenerator {
         $writer->write(")->proceed();");
         $writer->outdent();
         $writer->write("}");
+
+        echo $writer;exit;
     }
 
     public function generateParameter(Parameter $parameter, CodeWriter $writer) {
@@ -91,5 +93,8 @@ class ProxyGenerator {
             $writer->write("array ");
         }
         $writer->write('$', $parameter->name);
+        if($parameter->isDefaultValueAvailable()) {
+            $writer->write(" = ", $parameter->getDefaultValue());
+        }
     }
 }
