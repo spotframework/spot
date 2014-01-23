@@ -116,7 +116,7 @@ class Request extends \ArrayObject {
         $payload = [];
         if(isset($headers["Content-Type"])) {
             $contentType = $headers["Content-Type"];
-            if(strpos($contentType, "application/json")) {
+            if(strpos($contentType, "application/json") !== false) {
                 $payload = json_decode($body);
             }
         }
