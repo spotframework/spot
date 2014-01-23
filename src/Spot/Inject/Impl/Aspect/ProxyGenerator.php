@@ -36,6 +36,10 @@ class ProxyGenerator {
         $writer->writeln("}");
 
         foreach($type->getMethods(Method::IS_PUBLIC) as $method) {
+            if($method->isConstructor()) {
+                continue;
+            }
+
             if($this->pointCuts->matches($method)) {
                 $this->generateMethod($method, $this->pointCuts->getAdvices($method), $writer);
             } else {
@@ -57,12 +61,13 @@ class ProxyGenerator {
         $writer->write(") {");
         $writer->indent();
             $writer->write('return $this->d->', $method->name, "(");
-        if($parameters) {
-            $writer->write('$', array_shift($parameters)->name);
-            foreach($parameters as $parameter) {
-                $writer->write(', $', $parameter->name);
+            $parameters = $method->getParameters();
+            if($parameters) {
+                $writer->write('$', array_shift($parameters)->name);
+                foreach($parameters as $parameter) {
+                    $writer->write(', $', $parameter->name);
+                }
             }
-        }
             $writer->write(");");
         $writer->outdent();
         $writer->write("}");
