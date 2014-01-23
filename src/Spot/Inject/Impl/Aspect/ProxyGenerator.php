@@ -36,12 +36,36 @@ class ProxyGenerator {
         $writer->writeln("}");
 
         foreach($type->getMethods(Method::IS_PUBLIC) as $method) {
-            if(!$this->pointCuts->matches($method)) {
-                continue;
+            if($this->pointCuts->matches($method)) {
+                $this->generateMethod($method, $this->pointCuts->getAdvices($method), $writer);
+            } else {
+                $this->generateDelegateMethod($method, $writer);
             }
-
-            $this->generateMethod($method, $this->pointCuts->getAdvices($method), $writer);
         }
+    }
+
+    public function generateDelegateMethod(Method $method, CodeWriter $writer) {
+        $writer->write("function ", $method->name, "(");
+        $parameters = $method->getParameters();
+        if($parameters) {
+            $this->generateParameter(array_shift($parameters), $writer);
+            foreach($parameters as $parameter) {
+                $writer->write(", ");
+                $this->generateParameter($parameter, $writer);
+            }
+        }
+        $writer->write(") {");
+        $writer->indent();
+            $writer->write('return $this->d->', $method->name, "(");
+        if($parameters) {
+            $writer->write('$', array_shift($parameters)->name);
+            foreach($parameters as $parameter) {
+                $writer->write(', $', $parameter->name);
+            }
+        }
+            $writer->write(");");
+        $writer->outdent();
+        $writer->write("}");
     }
 
     public function generateMethod(Method $method, array $advices, CodeWriter $writer) {
