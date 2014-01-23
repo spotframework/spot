@@ -27,10 +27,11 @@ class Request extends \ArrayObject {
             $body,
             array $QUERY,
             array $POST,
+            array $PAYLOAD,
             array $FILES,
             array $COOKIE,
             array $HEADERS) {
-        parent::__construct($POST + $QUERY, \ArrayObject::STD_PROP_LIST);
+        parent::__construct($PAYLOAD + $POST + $QUERY, \ArrayObject::STD_PROP_LIST);
 
         $this->method = $method;
         $this->uri = $uri;
@@ -112,6 +113,14 @@ class Request extends \ArrayObject {
             $files = [],
             $cookie = [],
             $headers = []) {
+        $payload = [];
+        if(isset($headers["Content-Type"])) {
+            $contentType = $headers["Content-Type"];
+            if(strpos($contentType, "application/json")) {
+                $payload = json_decode($body);
+            }
+        }
+
         return new Request(
             $method,
             "/".trim(urldecode($uri), "/"),
@@ -119,6 +128,7 @@ class Request extends \ArrayObject {
             $body,
             $query,
             $post,
+            $payload,
             $files,
             $cookie,
             $headers
