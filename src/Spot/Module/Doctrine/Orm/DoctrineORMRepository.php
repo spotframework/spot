@@ -5,7 +5,7 @@ use Spot\Domain\Repository;
 use Doctrine\ORM\EntityManager;
 
 abstract class DoctrineORMRepository implements Repository {
-    private $em;
+    protected $em;
 
     public function __construct(EntityManager $em) {
         $this->em = $em;
