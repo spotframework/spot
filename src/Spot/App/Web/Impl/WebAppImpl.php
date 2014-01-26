@@ -61,6 +61,9 @@ class WebAppImpl implements WebApp {
         } catch(HttpException $e) {
             $response->setHttpCode($e->getCode());
             $response->write($e->getMessage());
+        } catch(\InvalidArgumentException $e) {
+            $response->setHttpCode(Response::BAD_REQUEST);
+            $response->write($e->getMessage());
         } catch(\Exception $e) {
             $response->setHttpCode(Response::INTERNAL_SERVER_ERROR);
             $response->write($e->getMessage());
