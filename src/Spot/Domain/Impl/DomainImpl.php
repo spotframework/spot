@@ -22,6 +22,14 @@ class DomainImpl implements Domain {
         return $this->locator->find($domainName)->find($id);
     }
 
+    function persist($domain) {
+        return $this->locator->find(get_class($domain))->persist($domain);
+    }
+
+    function remove($domain) {
+        return $this->locator->find(get_class($domain))->remove($domain);
+    }
+
     function newInstance($domainName, array $bindings) {
         $binder = $this->factory->getBinder($domainName);
 

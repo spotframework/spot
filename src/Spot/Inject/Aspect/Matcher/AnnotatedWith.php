@@ -9,9 +9,18 @@ class AnnotatedWith implements MethodMatcher {
     public $value;
 
     function matches(Method $method) {
-        return
-            $method->isAnnotatedWith($this->value)
+        if( $method->isAnnotatedWith($this->value)
             ||
-            $method->getType()->isAnnotatedWith($this->value);
+            $method->getType()->isAnnotatedWith($this->value)) {
+            return true;
+        }
+
+        foreach($method->getParameters() as $parameter) {
+            if($parameter->isAnnotatedWith($this->value)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
