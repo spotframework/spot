@@ -86,9 +86,9 @@ class BinderGenerator {
             throw new \LogicException("Invalid binding name in {$method->class}::{$method->name}()");
         }
 
-        $writer->write('foreach((array)');
+        $writer->write('foreach(isset($b["', $name, '"]) ? (array)');
         $this->writeBinding($name, $writer);
-        $writer->write(' as $v) {');
+        $writer->write(' : [] as $v) {');
         $writer->indent();
         $writer->write('$i->', $method->name, '(');
 
