@@ -68,6 +68,7 @@ class BinderGenerator {
             throw new \LogicException("Invalid binding name in {$method->class}::{$method->name}()");
         }
 
+        $writer->write('isset($b["', $name, '"]) && ');
         $writer->write('$i->', $method->name, '(');
         ($class = $method->getParameters()[0]->getClass())
             ? $this->writeTypedBinding($class, $name, $writer)
