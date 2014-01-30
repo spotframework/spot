@@ -1,6 +1,7 @@
 <?php
 namespace Spot\Module\Symfony\Validator;
 
+use Spot\Domain\InvalidEntityException;
 use Spot\Domain\Validator;
 use Symfony\Component\Validator\ValidatorInterface as SymfonyValidator;
 
@@ -19,9 +20,9 @@ class SymfonyValidatorAdapter implements Validator {
     }
 
 
-    function validate($domain, array $groups = null) {
+    function validate($entity, array $groups = null) {
         $violations = $this->symfonyValidator->validate(
-            $domain,
+            $entity,
             $groups,
             $this->traverse,
             $this->deep
@@ -32,11 +33,9 @@ class SymfonyValidatorAdapter implements Validator {
 
         $errors = [];
         foreach($violations as $violation) {
-            $errors[$violation->getPropertyPath()] = $violation->getMessage();
+            $errors[$violation->getPropertyPath()][] = $violation->getMessage();
         }
 
-        return $errors;
-
-        return $violations;
+        throw new InvalidEntityException($entity, $errors);
     }
 }
