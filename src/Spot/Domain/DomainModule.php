@@ -25,7 +25,7 @@ class DomainModule {
         return $interceptor;
     }
 
-    /** @Intercept(@AnnotatedWith(@Persist)) */
+    /** @Intercept(@AnnotatedWith("Spot\Domain\Validate")) */
     static public function provideValidationInterceptor(ValidationInterceptor $interceptor) {
         return $interceptor;
     }
