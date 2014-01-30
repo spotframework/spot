@@ -14,8 +14,7 @@ class TransactionalInterceptor implements MethodInterceptor {
     }
 
     function intercept(MethodInvocation $invocation) {
-        $this->level++ && $this->domain->beginTransaction();
-
+        $this->level++ || $this->domain->beginTransaction();
         try {
             $result = $invocation->proceed();
 

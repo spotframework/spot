@@ -8,6 +8,8 @@ interface Domain {
 
     function remove($domain);
 
+    function validate($domain, array $group = null);
+
     function newInstance($domainName, array $bindings);
 
     function bind($domain, array $bindings);

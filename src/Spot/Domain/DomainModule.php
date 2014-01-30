@@ -4,6 +4,7 @@ namespace Spot\Domain;
 use Spot\Domain\Impl\DomainImpl;
 use Spot\Domain\Impl\PersistenceInterceptor;
 use Spot\Domain\Impl\TransactionalInterceptor;
+use Spot\Domain\Impl\ValidationInterceptor;
 use Spot\Inject\Named;
 use Spot\Inject\Provides;
 use Spot\Inject\Singleton;
@@ -24,7 +25,12 @@ class DomainModule {
         return $interceptor;
     }
 
-    /** @Intercept(@AnnotatedWith(@Transactional)) */
+    /** @Intercept(@AnnotatedWith(@Persist)) */
+    static public function provideValidationInterceptor(ValidationInterceptor $interceptor) {
+        return $interceptor;
+    }
+
+    /** @Intercept(@AnnotatedWith(@Transactional)) @Singleton */
     static public function provideTransactionalInterceptor(TransactionalInterceptor $interceptor) {
         return $interceptor;
     }
