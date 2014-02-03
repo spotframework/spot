@@ -1,6 +1,7 @@
 <?php
 namespace Spot\Module\Doctrine\ORM;
 
+use Doctrine\Common\Proxy\AbstractProxyFactory;
 use Spot\Inject\Named;
 use Spot\Inject\Provides;
 use Spot\Inject\Singleton;
@@ -22,13 +23,17 @@ class DoctrineORMModule {
         Cache $cache,
         /** @Named("app.debug") */$debug,
         /** @Named("app.dump-dir") */$dumpDir,
-        /** @Named("app.module.paths") */array $paths = []) {
-        return Setup::createAnnotationMetadataConfiguration(
+        /** @Named("app.module.paths") */array $paths = [],
+        /** @Named("doctrine.orm.proxy.autogenerate") */$autogenerate = AbstractProxyFactory::AUTOGENERATE_FILE_NOT_EXISTS) {
+        $config = Setup::createAnnotationMetadataConfiguration(
             $paths,
             $debug,
             "{$dumpDir}/doctrine/orm",
             $cache
         );
+        $config->setAutoGenerateProxyClasses($autogenerate);
+
+        return $config;
     }
 
     /** @Provides("Doctrine\ORM\EntityManager") @Singleton */
