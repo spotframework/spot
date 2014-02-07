@@ -4,6 +4,7 @@ namespace Spot\Module\Redis;
 use Spot\Inject\Named;
 use Spot\Inject\Provides;
 use Spot\Inject\Singleton;
+use Spot\Domain\Transactional;
 
 class RedisModule {
     /** @Provides("Redis") @Singleton */
@@ -21,7 +22,7 @@ class RedisModule {
     }
 
     /** @Provides(Provides::ELEMENT) @Transactional @Singleton */
-    static public function name(RedisUnitOfWork $work) {
+    static public function provideUnitOfWork(RedisUnitOfWork $work) {
         return $work;
     }
 }
