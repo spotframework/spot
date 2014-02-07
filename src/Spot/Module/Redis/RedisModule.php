@@ -11,8 +11,12 @@ class RedisModule {
             /** @Named("redis.host") */$host = "localhost",
             /** @Named("redis.port") */$port = 6379,
             /** @Named("redis.sock") */$sock = null) {
-        return $sock
-            ? new \Redis($sock)
-            : new \Redis($host, $port);
+        $redis = new \Redis();
+
+        $sock
+            ? $redis->pconnect($sock)
+            : $redis->pconnect($host, $port);
+
+        return $redis;
     }
 }
