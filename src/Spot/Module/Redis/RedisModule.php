@@ -19,4 +19,9 @@ class RedisModule {
 
         return $redis;
     }
+
+    /** @Provides(Provides::ELEMENT) @Transactional @Singleton */
+    static public function name(RedisUnitOfWork $work) {
+        return $work;
+    }
 }
