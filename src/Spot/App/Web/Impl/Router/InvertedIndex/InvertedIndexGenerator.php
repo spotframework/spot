@@ -60,8 +60,8 @@ class InvertedIndexGenerator {
         $writer->indent();
             $writer->write("parent::__construct(");
             $writer->indent();
-                $writer->writeln(var_export($actions, true), ", ");
                 $writer->writeln(var_export($names, true), ", ");
+                $writer->writeln(var_export($actions, true), ", ");
                 $writer->writeln("new MethodIndex(", var_export($methods, true), "), ");
                 $writer->writeln("new AjaxIndex(", var_export($ajax, true), "), ");
                 $writer->writeln("new StaticPathIndex(", var_export($staticPaths, true), "), ");
