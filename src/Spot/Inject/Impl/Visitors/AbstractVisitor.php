@@ -18,6 +18,7 @@ use Spot\Inject\Bindings\ProviderMethodBinding;
 use Spot\Inject\Bindings\SingletonBinding;
 use Spot\Inject\Bindings\InjectorBinding;
 use Spot\Inject\ConfigurationException;
+use Spot\Inject\Bindings\LazyBinding;
 
 class AbstractVisitor implements BindingVisitor {
     function visit(Binding $binding) {
@@ -62,6 +63,9 @@ class AbstractVisitor implements BindingVisitor {
 
         $binding instanceof InjectorBinding &&
             $this->visitInjector($binding);
+
+        $binding instanceof LazyBinding &&
+            $this->visitLazy($binding);
     }
 
     public function visitCollection(CollectionBinding $collection) {
@@ -113,4 +117,6 @@ class AbstractVisitor implements BindingVisitor {
     }
 
     public function visitInjector(InjectorBinding $injector) {}
+
+    public function visitLazy(LazyBinding $lazy) {}
 }

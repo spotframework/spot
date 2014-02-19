@@ -8,6 +8,7 @@ use Spot\App\Web\Request;
 use Spot\App\Web\Response;
 use Spot\Domain\Domain;
 use Spot\Inject\Injector;
+use Spot\Inject\Lazy;
 
 class Dispatcher {
     private $method,

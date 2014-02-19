@@ -34,7 +34,8 @@ class LazyGenerator {
         $parameters = $method->getParameters();
         if($parameters) {
             $this->generateParameter(array_shift($parameters), $writer);
-            foreach($method->getParameters() as $parameter) {
+            foreach($parameters as $parameter) {
+                $writer->write(", ");
                 $this->generateParameter($parameter, $writer);
             }
         }
@@ -44,7 +45,8 @@ class LazyGenerator {
             $parameters = $method->getParameters();
             if($parameters) {
                 $writer->write("$", array_shift($parameters)->name);
-                foreach($method->getParameters() as $parameter) {
+                foreach($parameters as $parameter) {
+                    $writer->write(", ");
                     $writer->write("$", $parameter->name);
                 }
             }
@@ -56,7 +58,7 @@ class LazyGenerator {
     public function generateParameter(Parameter $parameter, CodeWriter $writer) {
         $class = $parameter->getClass();
         if($class) {
-            $writer->write($class->name, " ");
+            $writer->write("\\", $class->name, " ");
         } else if($parameter->isArray()) {
             $writer->write("array ");
         } else if($parameter->isCallable()) {

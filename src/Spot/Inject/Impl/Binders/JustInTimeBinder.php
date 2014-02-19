@@ -4,6 +4,7 @@ namespace Spot\Inject\Impl\Binders;
 use Spot\Inject\Bindings\ConstantNameBinding;
 use Spot\Inject\Bindings\ConstantValueBinding;
 use Spot\Inject\Bindings\InlineBinding;
+use Spot\Inject\Bindings\LazyBinding;
 use Spot\Inject\ConfigurationException;
 use Spot\Inject\Impl\Bindings;
 use Spot\Inject\Key;
@@ -34,6 +35,10 @@ class JustInTimeBinder {
 
     public function bindParameter(Parameter $parameter) {
         $key = Key::ofParameter($parameter);
+        if($parameter->isAnnotatedWith("Spot\\Inject\\Lazy")) {
+            return new LazyBinding($key);
+        }
+
         $binding = $this->bindings->get($key);
         if(empty($binding)) {
             $class = $parameter->getClass();

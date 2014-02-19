@@ -9,6 +9,7 @@ use Spot\Inject\Bindings\ConstantNameBinding;
 use Spot\Inject\Bindings\ConstantValueBinding;
 use Spot\Inject\Bindings\InjectorBinding;
 use Spot\Inject\Bindings\LateBinding;
+use Spot\Inject\Bindings\LazyBinding;
 use Spot\Inject\Bindings\OptionalBinding;
 use Spot\Inject\Bindings\ProviderMethodBinding;
 use Spot\Inject\Bindings\SingletonBinding;
@@ -142,5 +143,18 @@ class FactoryCompilerVisitor extends AbstractVisitor {
         } else {
             $resolution->accept($this);
         }
+    }
+
+    public function visitLazy(LazyBinding $lazy) {
+        $key = $lazy->getKey();
+
+        $this->writer->write('$i->getLazy(Key::ofType(');
+        $this->writer->literal($key->getType());
+        if($key->getQualifier()) {
+            $this->writer->write(", unserialize(");
+            $this->writer->literal(serialize($key->getQualifier()));
+            $this->writer->write(")");
+        }
+        $this->writer->write('))');
     }
 }

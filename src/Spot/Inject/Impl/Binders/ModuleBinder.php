@@ -5,6 +5,7 @@ use Spot\Inject\Bindings\CollectionBinding;
 use Spot\Inject\Bindings\ConstantNameBinding;
 use Spot\Inject\Bindings\ConstantValueBinding;
 use Spot\Inject\Bindings\LateBinding;
+use Spot\Inject\Bindings\LazyBinding;
 use Spot\Inject\Bindings\ModuleBinding;
 use Spot\Inject\Bindings\OptionalBinding;
 use Spot\Inject\Bindings\ProviderMethodBinding;
@@ -94,13 +95,17 @@ class ModuleBinder {
 
     public function bindParameter(Parameter $parameter) {
         $key = Key::ofParameter($parameter);
+        if($parameter->isAnnotatedWith("Spot\\Inject\\Lazy")) {
+            return new LazyBinding($key);
+        }
+
         $binding = new LateBinding($key);
         if($parameter->isDefaultValueAvailable()) {
-            $binding =
-                new OptionalBinding($key, $parameter->isDefaultValueConstant()
+            $binding = new OptionalBinding(
+                $key,
+                $parameter->isDefaultValueConstant()
                     ? new ConstantNameBinding($key, $parameter->getDefaultValueConstantName())
-                    : new ConstantValueBinding($key, $parameter->getDefaultValue()
-                )
+                    : new ConstantValueBinding($key, $parameter->getDefaultValue())
             );
         }
 
