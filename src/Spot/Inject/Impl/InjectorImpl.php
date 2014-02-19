@@ -18,15 +18,18 @@ use Psr\Log\LoggerInterface;
 class InjectorImpl implements Injector {
     private $modules,
             $singletons,
-            $factory;
+            $factory,
+            $lazy;
 
     protected function __construct(
             Modules $modules,
             Singletons $singletons,
-            FactoryFactory $factory) {
+            FactoryFactory $factory,
+            LazyFactory $lazy) {
         $this->modules = $modules;
         $this->singletons = $singletons;
         $this->factory = $factory;
+        $this->lazy = $lazy;
     }
 
     function get(Key $key) {
@@ -37,6 +40,12 @@ class InjectorImpl implements Injector {
 
     function getInstance($type) {
         return $this->get(Key::ofType($type));
+    }
+
+    function getLazy(Key $key) {
+        $lazyClass = $this->lazy->get($key);
+
+        return new $lazyClass($this, $key);
     }
 
     function fork(array $modules) {
@@ -52,7 +61,7 @@ class InjectorImpl implements Injector {
         $singletons = new LinkedSingletons($this->singletons);
         $factory = $this->factory->fork($modules, $bindings, $singletons);
 
-        return new InjectorImpl($modules, $singletons, $factory);
+        return new InjectorImpl($modules, $singletons, $factory, $this->lazy);
     }
 
     /**
@@ -70,6 +79,8 @@ class InjectorImpl implements Injector {
         $modules = new Modules($modules);
         $bindings = new Bindings();
         $singletons = new Singletons();
+        $lazyGen = new LazyGenerator();
+        $lazy = new LazyFactory($reflection, $storage, $lazyGen);
 
         $factory = FactoryFactory::create(
             $modules,
@@ -79,6 +90,6 @@ class InjectorImpl implements Injector {
             $reflection
         );
 
-        return new InjectorImpl($modules, $singletons, $factory);
+        return new InjectorImpl($modules, $singletons, $factory, $lazy);
     }
 }

@@ -18,6 +18,16 @@ interface Injector {
      */
     function getInstance($type);
 
+
+    /**
+     * Get lazy proxy instance represented by given key
+     * that will be initialized once it used
+     *
+     * @param Key $key
+     * @return mixed
+     */
+    function getLazy(Key $key);
+
     /**
      * Create a child injector which inherits bindings from this injector
      *
