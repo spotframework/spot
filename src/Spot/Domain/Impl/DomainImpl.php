@@ -8,17 +8,14 @@ use Spot\Domain\Validator;
 class DomainImpl implements Domain {
     private $factory,
             $locator,
-            $validator,
             $works;
 
     public function __construct(
             BinderFactory $factory,
             RepositoryLocator $locator,
-            Validator $validator,
             /** @Transactional */array $works = []) {
         $this->factory = $factory;
         $this->locator = $locator;
-        $this->validator = $validator;
         $this->works = $works;
     }
 
@@ -62,9 +59,5 @@ class DomainImpl implements Domain {
         foreach($this->works as $work) {
             $work->rollback();
         }
-    }
-
-    function validate($domain, array $groups = null) {
-        return $this->validator->validate($domain, $groups);
     }
 }

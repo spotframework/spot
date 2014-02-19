@@ -7,7 +7,7 @@ use Spot\Module\Symfony\Validator\SymfonyValidatorAdapter;
 use Symfony\Component\Validator\Validation;
 
 class SymfonyValidatorModule {
-    /** @Provides("Spot\Domain\Validator") @Singleton */
+    /** @Provides("Spot\Domain\Validator", overrides = true) @Singleton */
     static public function provideValidator(SymfonyValidatorAdapter $validator) {
         return $validator;
     }
