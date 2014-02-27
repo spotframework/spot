@@ -94,6 +94,10 @@ class Response {
         }
     }
 
+    public function getHeaders() {
+        return $this->headers;
+    }
+
     public function setHttpCode($code) {
         if(!isset(self::$names[$code])) {
             throw new \InvalidArgumentException("Http code {$code} is invalid");
@@ -130,6 +134,10 @@ class Response {
 
     public function write($s) {
         $this->body .= implode(func_get_args());
+    }
+
+    public function getBody() {
+        return $this->body;
     }
 
     public function setCookie(
