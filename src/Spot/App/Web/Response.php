@@ -136,10 +136,6 @@ class Response {
         $this->body .= implode(func_get_args());
     }
 
-    public function getBody() {
-        return $this->body;
-    }
-
     public function setCookie(
             $name,
             $value,
