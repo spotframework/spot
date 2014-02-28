@@ -8,7 +8,7 @@ use React\EventLoop\LoopInterface;
 use React\EventLoop\Factory;
 
 class ReactModule {
-    /** @Provides("giReact\EventLoop\LoopInterface") @Singleton */
+    /** @Provides("React\EventLoop\LoopInterface") @Singleton */
     static public function provideEventLoop() {
         return Factory::create();
     }
