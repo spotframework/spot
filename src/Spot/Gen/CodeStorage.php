@@ -24,7 +24,7 @@ class CodeStorage {
         if(is_file($path)) {
             require $path;
 
-            return true;
+            return $this->load($typeName);
         }
 
         return false;
