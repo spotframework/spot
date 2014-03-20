@@ -18,7 +18,7 @@ class DoctrineDBALModule {
             "host" => $host,
             "driver" => $driver,
             "dbname" => $dbname,
-            "username" => $username,
+            "user" => $username,
             "password" => $password,
         ]);
     }
