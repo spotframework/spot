@@ -15,7 +15,7 @@ class SwiftSmtpModule {
         $smtp = \Swift_SmtpTransport::newInstance($host, $port, $security);
         $username && $smtp->setUsername($username);
         $password && $smtp->setPassword($password);
-        
+
         return $smtp;
     }
 }
