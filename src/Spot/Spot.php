@@ -103,7 +103,7 @@ final class Spot {
     }
 
     static public function buildDev() {
-        $dump = sys_get_temp_dir() . time();
+        $dump = trim(sys_get_temp_dir(), "/") . "/" . time();
         $cache = new ArrayCache();
         $storage = CodeStorage::create($dump);
 
