@@ -103,7 +103,7 @@ final class Spot {
     }
 
     static public function buildDev() {
-        $dump = trim(sys_get_temp_dir(), "/") . "/" . time();
+        $dump = rtrim(sys_get_temp_dir(), "/") . "/" . time();
         $cache = new ArrayCache();
         $storage = CodeStorage::create($dump);
 
@@ -111,7 +111,7 @@ final class Spot {
     }
 
     static public function buildProd($dump = null) {
-        $dump = $dump ?: (trim(sys_get_temp_dir(), "/") . "/" . posix_getppid());
+        $dump = $dump ?: (rtrim(sys_get_temp_dir(), "/") . "/" . posix_getppid());
         $storage = CodeStorage::create($dump);
 
         if(extension_loaded("apc")) {
