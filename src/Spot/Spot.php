@@ -111,7 +111,7 @@ final class Spot {
     }
 
     static public function buildProd($dump = null) {
-        $dump = $dump ?: (sys_get_temp_dir() . posix_getppid());
+        $dump = $dump ?: (trim(sys_get_temp_dir(), "/") . "/" . posix_getppid());
         $storage = CodeStorage::create($dump);
 
         if(extension_loaded("apc")) {
